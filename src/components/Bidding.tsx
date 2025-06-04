@@ -4,71 +4,86 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, DollarSign, Users, TrendingUp, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star } from "lucide-react";
 
 const Bidding = () => {
   const [activeBids, setActiveBids] = useState([]);
+  const [selectedPriority, setSelectedPriority] = useState({});
 
-  const opportunities = [
+  const kuccpsOpportunities = [
     {
       id: 1,
-      company: 'TechCorp India',
-      position: 'Software Engineer',
-      type: 'Full-time',
-      location: 'Bangalore',
-      package: { min: 8, max: 15, currency: '₹', unit: 'LPA' },
-      currentBid: 12,
-      minBid: 8,
-      maxBid: 15,
-      deadline: '2024-06-10',
-      timeLeft: '2 days',
-      totalBidders: 45,
-      requirements: ['React', 'Node.js', 'MongoDB'],
-      description: 'Join our growing team to build next-generation web applications.',
+      institution: 'University of Nairobi',
+      program: 'Bachelor of Medicine and Bachelor of Surgery',
+      code: 'J01/01/01',
+      type: 'Degree',
+      location: 'Nairobi',
+      cutoffPoints: { current: 75, minimum: 70, maximum: 84 },
+      currentCutoff: 75,
+      minCutoff: 70,
+      maxCutoff: 84,
+      deadline: '2024-06-15',
+      timeLeft: '3 days',
+      totalBidders: 2840,
+      capacity: 150,
+      clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
+      description: 'Premier medical program with clinical training at Kenyatta National Hospital.',
       status: 'active',
-      userBid: null
+      userBid: null,
+      helbEligible: true,
+      scholarships: ['Merit-based', 'Need-based']
     },
     {
       id: 2,
-      company: 'DataFlow Solutions',
-      position: 'Data Analyst',
-      type: 'Full-time',
-      location: 'Mumbai',
-      package: { min: 6, max: 12, currency: '₹', unit: 'LPA' },
-      currentBid: 9,
-      minBid: 6,
-      maxBid: 12,
-      deadline: '2024-06-08',
-      timeLeft: '5 hours',
-      totalBidders: 32,
-      requirements: ['Python', 'SQL', 'Tableau'],
-      description: 'Analyze complex datasets to drive business insights.',
+      institution: 'JKUAT',
+      program: 'Bachelor of Science in Computer Science',
+      code: 'J07/04/02',
+      type: 'Degree',
+      location: 'Kiambu',
+      cutoffPoints: { current: 65, minimum: 58, maximum: 72 },
+      currentCutoff: 65,
+      minCutoff: 58,
+      maxCutoff: 72,
+      deadline: '2024-06-12',
+      timeLeft: '8 hours',
+      totalBidders: 1560,
+      capacity: 120,
+      clusters: ['Mathematics', 'Physics', 'Computer Studies'],
+      description: 'Technology-focused program with industry partnerships and internships.',
       status: 'urgent',
-      userBid: 8.5
+      userBid: 62,
+      helbEligible: true,
+      scholarships: ['Tech Innovation Fund']
     },
     {
       id: 3,
-      company: 'InnovateX',
-      position: 'Product Manager',
-      type: 'Full-time',
-      location: 'Pune',
-      package: { min: 15, max: 25, currency: '₹', unit: 'LPA' },
-      currentBid: 20,
-      minBid: 15,
-      maxBid: 25,
-      deadline: '2024-06-15',
+      institution: 'Strathmore University',
+      program: 'Bachelor of Business Science',
+      code: 'P15/03/01',
+      type: 'Degree',
+      location: 'Nairobi',
+      cutoffPoints: { current: 68, minimum: 60, maximum: 75 },
+      currentCutoff: 68,
+      minCutoff: 60,
+      maxCutoff: 75,
+      deadline: '2024-06-20',
       timeLeft: '1 week',
-      totalBidders: 28,
-      requirements: ['Strategy', 'Analytics', 'Leadership'],
-      description: 'Lead product development for our flagship mobile application.',
+      totalBidders: 980,
+      capacity: 80,
+      clusters: ['Mathematics', 'Business Studies', 'Economics'],
+      description: 'Business program with strong industry connections and entrepreneurship focus.',
       status: 'active',
-      userBid: null
+      userBid: null,
+      helbEligible: false,
+      scholarships: ['Academic Excellence', 'Leadership']
     }
   ];
 
-  const placeBid = (opportunityId, bidAmount) => {
-    setActiveBids(prev => [...prev, { opportunityId, bidAmount, timestamp: new Date() }]);
-    console.log(`Bid placed: ${bidAmount} for opportunity ${opportunityId}`);
+  const placeBid = (opportunityId, priority) => {
+    setSelectedPriority(prev => ({ ...prev, [opportunityId]: priority }));
+    setActiveBids(prev => [...prev, { opportunityId, priority, timestamp: new Date() }]);
+    console.log(`Priority ${priority} set for program ${opportunityId}`);
   };
 
   const getBidProgress = (current, min, max) => {
@@ -86,163 +101,202 @@ const Bidding = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Placement Bidding</h1>
-        <p className="text-gray-600 mt-1">Bid on opportunities and negotiate your ideal package</p>
+        <h1 className="text-3xl font-bold text-gray-900">KUCCPS Program Selection</h1>
+        <p className="text-gray-600 mt-1">Select and prioritize your preferred university programs through KUCCPS</p>
       </div>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">12</div>
-            <div className="text-sm text-gray-600">Active Opportunities</div>
+            <div className="text-2xl font-bold text-blue-600">6</div>
+            <div className="text-sm text-gray-600">Available Slots</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">3</div>
-            <div className="text-sm text-gray-600">Your Bids</div>
+            <div className="text-2xl font-bold text-green-600">2</div>
+            <div className="text-sm text-gray-600">Programs Selected</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600">₹12L</div>
-            <div className="text-sm text-gray-600">Avg Winning Bid</div>
+            <div className="text-2xl font-bold text-orange-600">B (65)</div>
+            <div className="text-sm text-gray-600">Your KCSE Points</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">85%</div>
-            <div className="text-sm text-gray-600">Success Rate</div>
+            <div className="text-2xl font-bold text-purple-600">78%</div>
+            <div className="text-sm text-gray-600">Match Probability</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Bidding Instructions */}
+      {/* KUCCPS Instructions */}
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
             <div className="space-y-1">
-              <div className="font-medium text-blue-900">How Bidding Works</div>
+              <div className="font-medium text-blue-900">KUCCPS Selection Guidelines</div>
               <div className="text-sm text-blue-700">
-                Companies post opportunities with package ranges. You can bid within that range based on your skills and experience. 
-                Higher bids increase your chances but should reflect your value proposition.
+                Select up to 6 programs in order of preference. KUCCPS will place you in the highest-preference program 
+                where you meet the cut-off points. Consider your KCSE performance, subject cluster, and career goals.
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Active Opportunities */}
+      {/* Available Programs */}
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Available Opportunities</h2>
-        {opportunities.map((opportunity) => (
-          <Card key={opportunity.id} className="hover:shadow-lg transition-shadow">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Available Programs</h2>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">AI Match Score:</span>
+            <Badge className="bg-green-100 text-green-800">85% Compatible</Badge>
+          </div>
+        </div>
+        
+        {kuccpsOpportunities.map((program) => (
+          <Card key={program.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center space-x-2">
-                    <CardTitle className="text-lg">{opportunity.position}</CardTitle>
-                    <Badge className={getStatusColor(opportunity.status)}>
-                      {opportunity.status === 'urgent' ? 'Ending Soon' : 'Active'}
+                    <CardTitle className="text-lg">{program.program}</CardTitle>
+                    <Badge className={getStatusColor(program.status)}>
+                      {program.status === 'urgent' ? 'Deadline Soon' : 'Active'}
                     </Badge>
+                    {program.helbEligible && (
+                      <Badge className="bg-green-100 text-green-800 border-green-300">
+                        HELB Eligible
+                      </Badge>
+                    )}
                   </div>
                   <CardDescription className="mt-1">
-                    {opportunity.company} • {opportunity.location} • {opportunity.type}
+                    {program.institution} • {program.location} • Code: {program.code}
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">Package Range</div>
+                  <div className="text-sm text-gray-600">Current Cut-off</div>
                   <div className="font-bold text-green-600">
-                    {opportunity.package.currency}{opportunity.package.min}-{opportunity.package.max} {opportunity.package.unit}
+                    {program.currentCutoff} points
                   </div>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-600 text-sm">{opportunity.description}</p>
+              <p className="text-gray-600 text-sm">{program.description}</p>
               
-              {/* Requirements */}
+              {/* Subject Clusters */}
               <div>
-                <div className="text-sm font-medium mb-2">Requirements:</div>
+                <div className="text-sm font-medium mb-2">Required Subject Clusters:</div>
                 <div className="flex flex-wrap gap-1">
-                  {opportunity.requirements.map((req, index) => (
+                  {program.clusters.map((cluster, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
-                      {req}
+                      {cluster}
                     </Badge>
                   ))}
                 </div>
               </div>
 
-              {/* Bidding Information */}
+              {/* Scholarships */}
+              {program.scholarships.length > 0 && (
+                <div>
+                  <div className="text-sm font-medium mb-2">Available Scholarships:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {program.scholarships.map((scholarship, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        <Star className="w-3 h-3 mr-1" />
+                        {scholarship}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Cut-off Information */}
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Current Winning Bid:</span>
+                  <span className="text-gray-600">Current Cut-off Points:</span>
                   <span className="font-bold text-green-600">
-                    {opportunity.package.currency}{opportunity.currentBid} {opportunity.package.unit}
+                    {program.currentCutoff} points
                   </span>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Bid Progress</span>
-                    <span>{Math.round(getBidProgress(opportunity.currentBid, opportunity.minBid, opportunity.maxBid))}%</span>
+                    <span>Cut-off Range</span>
+                    <span>{Math.round(getBidProgress(program.currentCutoff, program.minCutoff, program.maxCutoff))}%</span>
                   </div>
                   <Progress 
-                    value={getBidProgress(opportunity.currentBid, opportunity.minBid, opportunity.maxBid)} 
+                    value={getBidProgress(program.currentCutoff, program.minCutoff, program.maxCutoff)} 
                     className="h-2"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>{opportunity.package.currency}{opportunity.minBid}</span>
-                    <span>{opportunity.package.currency}{opportunity.maxBid}</span>
+                    <span>{program.minCutoff} pts (Min)</span>
+                    <span>{program.maxCutoff} pts (Historical Max)</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                    {opportunity.timeLeft}
+                    {program.timeLeft}
                   </div>
                   <div className="flex items-center">
                     <Users className="w-4 h-4 text-gray-400 mr-2" />
-                    {opportunity.totalBidders} bidders
+                    {program.totalBidders} applicants
                   </div>
                   <div className="flex items-center">
-                    <TrendingUp className="w-4 h-4 text-gray-400 mr-2" />
-                    Competitive
+                    <GraduationCap className="w-4 h-4 text-gray-400 mr-2" />
+                    {program.capacity} slots
                   </div>
                 </div>
               </div>
 
-              {/* User's Bid */}
-              {opportunity.userBid && (
+              {/* User's Selection */}
+              {selectedPriority[program.id] && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-blue-900">Your Current Bid:</span>
+                    <span className="text-sm font-medium text-blue-900">Your Priority:</span>
                     <span className="font-bold text-blue-600">
-                      {opportunity.package.currency}{opportunity.userBid} {opportunity.package.unit}
+                      Choice #{selectedPriority[program.id]}
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Bidding Actions */}
+              {/* Selection Actions */}
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="text-sm text-gray-600">
-                  Min bid: {opportunity.package.currency}{opportunity.minBid + 0.5} {opportunity.package.unit}
+                  Capacity: {program.capacity} students
                 </div>
                 <div className="space-x-2">
                   <Button variant="outline" size="sm">
                     View Details
                   </Button>
+                  <select 
+                    className="px-3 py-1 border rounded text-sm mr-2"
+                    onChange={(e) => placeBid(program.id, e.target.value)}
+                    value={selectedPriority[program.id] || ''}
+                  >
+                    <option value="">Select Priority</option>
+                    <option value="1">1st Choice</option>
+                    <option value="2">2nd Choice</option>
+                    <option value="3">3rd Choice</option>
+                    <option value="4">4th Choice</option>
+                    <option value="5">5th Choice</option>
+                    <option value="6">6th Choice</option>
+                  </select>
                   <Button 
                     size="sm" 
                     className="bg-gradient-to-r from-green-600 to-blue-600"
-                    onClick={() => placeBid(opportunity.id, opportunity.currentBid + 0.5)}
+                    disabled={!selectedPriority[program.id]}
                   >
-                    <DollarSign className="w-4 h-4 mr-1" />
-                    {opportunity.userBid ? 'Update Bid' : 'Place Bid'}
+                    Add to List
                   </Button>
                 </div>
               </div>
