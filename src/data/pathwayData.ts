@@ -1,79 +1,128 @@
 
 export const interests = [
-  { id: 'creative', label: 'Creative & Artistic Expression', icon: '🎨' },
+  { id: 'science', label: 'Science & Technology', icon: '🔬' },
+  { id: 'mathematics', label: 'Mathematics', icon: '📊' },
+  { id: 'arts', label: 'Arts & Design', icon: '🎨' },
   { id: 'sports', label: 'Sports & Physical Education', icon: '⚽' },
-  { id: 'social', label: 'Social Issues & Community', icon: '🤝' },
-  { id: 'research', label: 'Research & Analysis', icon: '📊' },
-  { id: 'technology', label: 'Technology & Innovation', icon: '💻' },
-  { id: 'science', label: 'Science & Laboratory Work', icon: '🔬' },
-  { id: 'mathematics', label: 'Mathematics & Problem Solving', icon: '📐' },
-  { id: 'engineering', label: 'Engineering & Design', icon: '⚙️' }
+  { id: 'social', label: 'Social Studies', icon: '🌍' },
+  { id: 'languages', label: 'Languages & Literature', icon: '📚' },
+  { id: 'business', label: 'Business & Entrepreneurship', icon: '💼' },
+  { id: 'agriculture', label: 'Agriculture & Environment', icon: '🌱' }
 ];
 
 export const pathways = [
   {
-    id: 'arts-sports',
-    title: 'Arts & Sports Science',
-    description: 'Creative arts, performing arts, sports science, and physical education',
-    subjects: ['Fine Arts', 'Music', 'Drama', 'Sports Science', 'Physical Education', 'Media Studies'],
-    careers: ['Artist', 'Sports Coach', 'Physical Therapist', 'Media Producer', 'Event Coordinator'],
-    duration: '3-4 years',
-    icon: '🎭'
-  },
-  {
-    id: 'social-sciences',
-    title: 'Social Sciences',
-    description: 'Humanities, social studies, languages, and business studies',
-    subjects: ['Psychology', 'Sociology', 'Political Science', 'Economics', 'Business Studies', 'Languages'],
-    careers: ['Social Worker', 'Counselor', 'Business Manager', 'Policy Analyst', 'Teacher'],
-    duration: '3-4 years',
-    icon: '🏛️'
-  },
-  {
     id: 'stem',
     title: 'Science, Technology, Engineering & Mathematics (STEM)',
-    description: 'Mathematics, sciences, engineering, and technology fields',
+    description: 'Focus on scientific and technical disciplines',
     subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Engineering'],
-    careers: ['Engineer', 'Doctor', 'Software Developer', 'Research Scientist', 'Data Analyst'],
-    duration: '3-6 years',
-    icon: '🔬'
+    careers: ['Engineer', 'Doctor', 'Scientist', 'IT Specialist', 'Researcher', 'Mathematician'],
+    duration: '4-6 years',
+    icon: '🔬',
+    minKcseGrade: 'B (60-79%)',
+    competencyLevel: 'Very Good'
+  },
+  {
+    id: 'social',
+    title: 'Social Sciences',
+    description: 'Study of society, human behavior, and relationships',
+    subjects: ['History', 'Geography', 'Economics', 'Psychology', 'Sociology', 'Political Science'],
+    careers: ['Lawyer', 'Economist', 'Social Worker', 'Diplomat', 'Journalist', 'Public Administrator'],
+    duration: '3-5 years',
+    icon: '🌍',
+    minKcseGrade: 'C (50-59%)',
+    competencyLevel: 'Good - Fairly Competent'
+  },
+  {
+    id: 'arts-sports',
+    title: 'Arts & Sports Science',
+    description: 'Creative arts, sports, and physical education',
+    subjects: ['Art & Design', 'Music', 'Drama', 'Physical Education', 'Sports Science', 'Literature'],
+    careers: ['Artist', 'Musician', 'Coach', 'Sports Therapist', 'Designer', 'Writer'],
+    duration: '3-4 years',
+    icon: '🎨',
+    minKcseGrade: 'C (50-59%)',
+    competencyLevel: 'Good - Fairly Competent'
   }
 ];
 
 export const institutionTypes = [
   {
     id: 'university',
-    title: 'Public/Private Universities',
-    description: 'Comprehensive degree programs leading to bachelor\'s, master\'s and PhD',
+    title: 'Universities',
+    description: 'Public and private universities offering degree programs',
     examples: ['University of Nairobi', 'Kenyatta University', 'Strathmore University', 'USIU-Africa'],
-    programs: ['Bachelor of Arts', 'Bachelor of Science', 'Bachelor of Engineering', 'Bachelor of Medicine'],
-    duration: '3-6 years',
-    requirements: 'C+ and above in KCSE'
+    programs: ['Bachelor\'s Degrees', 'Master\'s Programs', 'PhD Programs'],
+    duration: '4-6 years',
+    requirements: 'KCSE Grade B (60-79%) - Very Good Competency',
+    gradingAlignment: 'CBC Grade B and above for most programs'
   },
   {
     id: 'tvet',
     title: 'TVET Institutions',
-    description: 'Technical and Vocational Education and Training for practical skills',
-    examples: ['Kenya Technical Trainers College', 'Eldoret National Polytechnic', 'Mombasa Technical Training Institute'],
-    programs: ['Certificate Courses', 'Diploma Programs', 'Higher Diploma'],
-    duration: '6 months - 3 years',
-    requirements: 'D+ and above in KCSE'
+    description: 'Technical and Vocational Education and Training colleges',
+    examples: ['Kenya Institute of Management', 'Rift Valley Institute', 'Coast Institute of Technology'],
+    programs: ['Diplomas', 'Certificates', 'Artisan Courses'],
+    duration: '1-3 years',
+    requirements: 'KCSE Grade D (40-49%) - Sufficient/Pass Competency',
+    gradingAlignment: 'CBC Grade D minimum - basic competency required'
   },
   {
     id: 'polytechnic',
     title: 'National Polytechnics',
-    description: 'Specialized technical education with strong industry partnerships',
-    examples: ['Kenya Polytechnic University College', 'Mombasa Polytechnic University College'],
-    programs: ['Technical Diplomas', 'Higher National Diplomas', 'Bachelor of Technology'],
+    description: 'Technical institutions focusing on engineering and applied sciences',
+    examples: ['Kenya Polytechnic', 'Mombasa Polytechnic', 'Eldoret Polytechnic'],
+    programs: ['Engineering Diplomas', 'Applied Sciences', 'Technical Certificates'],
     duration: '2-4 years',
-    requirements: 'C- and above in KCSE'
+    requirements: 'KCSE Grade C (50-59%) - Good/Fairly Competent',
+    gradingAlignment: 'CBC Grade C for technical programs - fair competency in core subjects'
   }
 ];
 
+export const cbcGradingSystem = {
+  grades: [
+    {
+      grade: 'A',
+      markRange: '80% and above',
+      quality: 'Excellent',
+      competency: 'Competent',
+      description: 'Exceptional performance demonstrating mastery of competencies'
+    },
+    {
+      grade: 'B',
+      markRange: '60-79%',
+      quality: 'Very Good',
+      competency: 'Competent',
+      description: 'Above average performance with good grasp of competencies'
+    },
+    {
+      grade: 'C',
+      markRange: '50-59%',
+      quality: 'Good',
+      competency: 'Fairly Competent',
+      description: 'Satisfactory performance with adequate understanding'
+    },
+    {
+      grade: 'D',
+      markRange: '40-49%',
+      quality: 'Sufficient/Pass',
+      competency: 'Fairly Competent',
+      description: 'Minimum acceptable performance for progression'
+    },
+    {
+      grade: 'E',
+      markRange: 'Below 40%',
+      quality: 'Not Sufficient/Fail',
+      competency: 'Not Yet Competent',
+      description: 'Below minimum standards, requires intervention'
+    }
+  ]
+};
+
 export const steps = [
-  { id: 1, title: "Assess Interests", description: "Discover your academic interests" },
-  { id: 2, title: "Choose Pathway", description: "Select your academic pathway" },
-  { id: 3, title: "Select Institution", description: "Choose institution type" },
-  { id: 4, title: "Career Goals", description: "Define your career objectives" },
-  { id: 5, title: "Action Plan", description: "Build your transition plan" }
+  { id: 1, title: 'Interests', description: 'Discover your passions' },
+  { id: 2, title: 'Pathway', description: 'Choose academic direction' },
+  { id: 3, title: 'Institution', description: 'Select institution type' },
+  { id: 4, title: 'Goals', description: 'Set career objectives' },
+  { id: 5, title: 'Action Plan', description: 'Your roadmap to success' }
 ];
