@@ -353,6 +353,3 @@ export class SecureAssessmentHandler {
     return permissions[userRole]?.includes(operation) || false;
   }
 }
-
-// Export for use in components
-export { CompetencyPredictor, SecureAssessmentHandler };
