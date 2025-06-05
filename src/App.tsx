@@ -11,6 +11,7 @@ import Pathways from "./pages/Pathways";
 import BiddingPage from "./pages/BiddingPage";
 import Tracking from "./pages/Tracking";
 import AIAssessment from "./pages/AIAssessment";
+import InteractiveAIPage from "./pages/InteractiveAI";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/bidding" element={<BiddingPage />} />
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/ai-assessment" element={<AIAssessment />} />
+          <Route path="/interactive-ai" element={<InteractiveAIPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

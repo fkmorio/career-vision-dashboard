@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin } from "lucide-react";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
@@ -40,11 +40,11 @@ const StudentDashboard = () => {
       badge: "New"
     },
     { 
-      title: "HELB Application", 
-      description: "Apply for student loans", 
-      icon: Users, 
-      action: () => {},
-      badge: "Pending"
+      title: "Interactive AI Assistant", 
+      description: "Chat with AI for personalized guidance", 
+      icon: MessageSquare, 
+      action: () => navigate('/interactive-ai'),
+      badge: "Featured"
     },
     { 
       title: "KUCCPS Selection", 
