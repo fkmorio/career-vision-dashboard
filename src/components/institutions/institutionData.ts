@@ -20,6 +20,7 @@ export interface Institution {
 }
 
 export const kenyanInstitutions: Institution[] = [
+  // Universities (existing)
   {
     id: 1,
     name: 'University of Nairobi',
@@ -171,6 +172,183 @@ export const kenyanInstitutions: Institution[] = [
     helbEligible: true,
     scholarships: ['Catholic Church Scholarships', 'Social Justice Awards', 'Academic Excellence'],
     facilities: ['Chapel', 'Community Service Centers', 'Library', 'Research Centers']
+  },
+
+  // National Polytechnics
+  {
+    id: 9,
+    name: 'Kenya Polytechnic University College',
+    logo: '/placeholder.svg',
+    sector: 'National Polytechnic',
+    location: 'Nairobi',
+    rating: 4.1,
+    students: '25,000+',
+    description: 'Premier national polytechnic offering technical and vocational education.',
+    kuccpsCode: '03100',
+    cutoffPoints: { min: 'C-', max: 'B-', avg: 'C' },
+    cbaRequirement: 'level2',
+    openings: 4500,
+    clusters: ['Engineering Technology', 'ICT', 'Business Technology', 'Applied Sciences'],
+    programs: ['Mechanical Engineering Technology', 'Electrical Engineering', 'ICT', 'Business Studies'],
+    helbEligible: true,
+    scholarships: ['TVET Scholarships', 'Industry Partnerships', 'Skills Development Grants'],
+    facilities: ['Engineering Workshops', 'ICT Labs', 'Innovation Center', 'Industry Links']
+  },
+  {
+    id: 10,
+    name: 'Mombasa Polytechnic University College',
+    logo: '/placeholder.svg',
+    sector: 'National Polytechnic',
+    location: 'Mombasa',
+    rating: 4.0,
+    students: '18,000+',
+    description: 'Leading coastal polytechnic specializing in marine and port technology.',
+    kuccpsCode: '03200',
+    cutoffPoints: { min: 'C-', max: 'C+', avg: 'C' },
+    cbaRequirement: 'level2',
+    openings: 3200,
+    clusters: ['Marine Technology', 'Port Management', 'Engineering Technology', 'Business'],
+    programs: ['Marine Engineering', 'Port Operations', 'Logistics', 'Mechanical Technology'],
+    helbEligible: true,
+    scholarships: ['Coastal Development Fund', 'Maritime Scholarships', 'Port Authority Grants'],
+    facilities: ['Marine Workshops', 'Port Simulation Lab', 'Engineering Labs', 'Research Center']
+  },
+  {
+    id: 11,
+    name: 'Eldoret National Polytechnic',
+    logo: '/placeholder.svg',
+    sector: 'National Polytechnic',
+    location: 'Eldoret',
+    rating: 3.9,
+    students: '15,000+',
+    description: 'Regional polytechnic focusing on agricultural and engineering technology.',
+    kuccpsCode: '03300',
+    cutoffPoints: { min: 'D+', max: 'C+', avg: 'C-' },
+    cbaRequirement: 'level2',
+    openings: 2800,
+    clusters: ['Agricultural Technology', 'Engineering', 'Business Studies', 'Applied Sciences'],
+    programs: ['Agricultural Engineering', 'Food Technology', 'Civil Engineering', 'Business'],
+    helbEligible: true,
+    scholarships: ['Agricultural Development Fund', 'Regional Scholarships', 'Farmer Support Grants'],
+    facilities: ['Agricultural Labs', 'Food Processing Plant', 'Engineering Workshops', 'Demo Farm']
+  },
+
+  // Public TVET Institutions
+  {
+    id: 12,
+    name: 'Machakos Institute of Technology',
+    logo: '/placeholder.svg',
+    sector: 'Public TVET',
+    location: 'Machakos',
+    rating: 3.8,
+    students: '8,000+',
+    description: 'Public TVET institution offering practical technical skills training.',
+    kuccpsCode: '04100',
+    cutoffPoints: { min: 'D', max: 'C', avg: 'D+' },
+    cbaRequirement: 'level1',
+    openings: 1800,
+    clusters: ['Engineering Technology', 'ICT', 'Building & Construction', 'Business'],
+    programs: ['Electrical Installation', 'Plumbing', 'Computer Studies', 'Accounting'],
+    helbEligible: true,
+    scholarships: ['TVET Bursaries', 'Skills Development Fund', 'County Scholarships'],
+    facilities: ['Technical Workshops', 'Computer Labs', 'Construction Yard', 'Business Center']
+  },
+  {
+    id: 13,
+    name: 'Kisumu National Polytechnic',
+    logo: '/placeholder.svg',
+    sector: 'Public TVET',
+    location: 'Kisumu',
+    rating: 4.0,
+    students: '12,000+',
+    description: 'Western Kenya\'s leading TVET institution for technical education.',
+    kuccpsCode: '04200',
+    cutoffPoints: { min: 'D+', max: 'C+', avg: 'C-' },
+    cbaRequirement: 'level2',
+    openings: 2500,
+    clusters: ['Engineering Technology', 'ICT', 'Applied Sciences', 'Business Technology'],
+    programs: ['Mechanical Engineering', 'Electronics', 'Laboratory Technology', 'Hospitality'],
+    helbEligible: true,
+    scholarships: ['Lake Region Development Fund', 'Technical Skills Grants', 'Industry Partnerships'],
+    facilities: ['Modern Workshops', 'Science Labs', 'Hospitality Training Center', 'ICT Center']
+  },
+  {
+    id: 14,
+    name: 'Rift Valley Institute of Science & Technology',
+    logo: '/placeholder.svg',
+    sector: 'Public TVET',
+    location: 'Nakuru',
+    rating: 3.7,
+    students: '10,000+',
+    description: 'Regional TVET college specializing in science and technology programs.',
+    kuccpsCode: '04300',
+    cutoffPoints: { min: 'D', max: 'C', avg: 'D+' },
+    cbaRequirement: 'level1',
+    openings: 2200,
+    clusters: ['Applied Sciences', 'Engineering Technology', 'ICT', 'Agriculture Technology'],
+    programs: ['Laboratory Technology', 'Environmental Science', 'Automotive Technology', 'ICT'],
+    helbEligible: true,
+    scholarships: ['Science & Technology Fund', 'Regional Bursaries', 'Skills Enhancement Grants'],
+    facilities: ['Science Laboratories', 'Automotive Workshop', 'Environmental Lab', 'ICT Suite']
+  },
+
+  // Private TVET Institutions
+  {
+    id: 15,
+    name: 'St. Kizito Vocational Training Centre',
+    logo: '/placeholder.svg',
+    sector: 'Private TVET',
+    location: 'Nairobi',
+    rating: 4.2,
+    students: '3,500+',
+    description: 'Faith-based TVET institution providing quality vocational training.',
+    kuccpsCode: '05100',
+    cutoffPoints: { min: 'D', max: 'C+', avg: 'C-' },
+    cbaRequirement: 'level1',
+    openings: 800,
+    clusters: ['Engineering Technology', 'ICT', 'Business Studies', 'Social Work'],
+    programs: ['Electrical Technology', 'Computer Studies', 'Accounting', 'Social Work'],
+    helbEligible: true,
+    scholarships: ['Church Scholarships', 'Need-based Support', 'Academic Merit Awards'],
+    facilities: ['Technical Workshops', 'Computer Lab', 'Chapel', 'Community Outreach Center']
+  },
+  {
+    id: 16,
+    name: 'Kiambu Institute of Science & Technology',
+    logo: '/placeholder.svg',
+    sector: 'Private TVET',
+    location: 'Kiambu',
+    rating: 3.9,
+    students: '5,000+',
+    description: 'Private technical college offering industry-focused training programs.',
+    kuccpsCode: '05200',
+    cutoffPoints: { min: 'D', max: 'C', avg: 'D+' },
+    cbaRequirement: 'level1',
+    openings: 1200,
+    clusters: ['Engineering Technology', 'ICT', 'Business Technology', 'Health Technology'],
+    programs: ['Mechanical Technology', 'Information Technology', 'Business Management', 'Medical Technology'],
+    helbEligible: true,
+    scholarships: ['Private Scholarships', 'Industry Sponsorships', 'Merit-based Awards'],
+    facilities: ['Modern Workshops', 'IT Labs', 'Medical Technology Lab', 'Business Simulation Center']
+  },
+  {
+    id: 17,
+    name: 'Coast Institute of Technology',
+    logo: '/placeholder.svg',
+    sector: 'Private TVET',
+    location: 'Mombasa',
+    rating: 3.8,
+    students: '4,200+',
+    description: 'Coastal technical college specializing in marine and hospitality training.',
+    kuccpsCode: '05300',
+    cutoffPoints: { min: 'D', max: 'C+', avg: 'C-' },
+    cbaRequirement: 'level1',
+    openings: 950,
+    clusters: ['Marine Technology', 'Hospitality & Tourism', 'ICT', 'Business Studies'],
+    programs: ['Marine Engineering', 'Hotel Management', 'Tourism Management', 'ICT'],
+    helbEligible: true,
+    scholarships: ['Tourism Board Scholarships', 'Marine Industry Grants', 'Coastal Development Fund'],
+    facilities: ['Marine Training Center', 'Hospitality Training Kitchen', 'Computer Labs', 'Tourism Center']
   }
 ];
 
@@ -185,11 +363,42 @@ export const aiRecommendations = {
   topMatches: [
     { institution: 'University of Nairobi', match: 92, reason: 'Strong STEM performance aligns with Engineering programs', cbaLevel: 'level4' },
     { institution: 'JKUAT', match: 88, reason: 'Technology interests match university specialization', cbaLevel: 'level3' },
-    { institution: 'Strathmore University', match: 75, reason: 'Leadership skills suit business programs', cbaLevel: 'level4' }
+    { institution: 'Strathmore University', match: 75, reason: 'Leadership skills suit business programs', cbaLevel: 'level4' },
+    { institution: 'Kenya Polytechnic University College', match: 85, reason: 'Practical skills align with technical programs', cbaLevel: 'level2' },
+    { institution: 'Machakos Institute of Technology', match: 70, reason: 'Hands-on learning suits vocational interests', cbaLevel: 'level1' }
   ],
   competencyAlignment: {
-    'Mathematics': 'Engineering & Technology Programs',
-    'Sciences': 'Health Sciences & Research',
-    'Languages': 'Law & International Relations'
+    'Mathematics & Sciences': 'Engineering & Technology Programs',
+    'Practical Skills': 'TVET & Polytechnic Programs',
+    'Languages & Communication': 'Business & Social Sciences',
+    'Creative Arts': 'Design & Media Programs'
+  }
+};
+
+// Database and reporting data
+export const institutionalDatabase = {
+  totalInstitutions: kenyanInstitutions.length,
+  sectorBreakdown: {
+    'Public University': kenyanInstitutions.filter(i => i.sector === 'Public University').length,
+    'Private University': kenyanInstitutions.filter(i => i.sector === 'Private University').length,
+    'National Polytechnic': kenyanInstitutions.filter(i => i.sector === 'National Polytechnic').length,
+    'Public TVET': kenyanInstitutions.filter(i => i.sector === 'Public TVET').length,
+    'Private TVET': kenyanInstitutions.filter(i => i.sector === 'Private TVET').length,
+  },
+  totalCapacity: kenyanInstitutions.reduce((sum, inst) => sum + inst.openings, 0),
+  averageRating: (kenyanInstitutions.reduce((sum, inst) => sum + inst.rating, 0) / kenyanInstitutions.length).toFixed(1),
+  helbEligibleCount: kenyanInstitutions.filter(i => i.helbEligible).length,
+  cbaLevelDistribution: {
+    'level4': kenyanInstitutions.filter(i => i.cbaRequirement === 'level4').length,
+    'level3': kenyanInstitutions.filter(i => i.cbaRequirement === 'level3').length,
+    'level2': kenyanInstitutions.filter(i => i.cbaRequirement === 'level2').length,
+    'level1': kenyanInstitutions.filter(i => i.cbaRequirement === 'level1').length,
+  },
+  regionalDistribution: {
+    'Nairobi': kenyanInstitutions.filter(i => i.location.includes('Nairobi')).length,
+    'Central Kenya': kenyanInstitutions.filter(i => ['Kiambu', 'Thika', 'Machakos'].some(region => i.location.includes(region))).length,
+    'Coast': kenyanInstitutions.filter(i => i.location.includes('Mombasa')).length,
+    'Western': kenyanInstitutions.filter(i => i.location.includes('Kisumu')).length,
+    'Rift Valley': kenyanInstitutions.filter(i => ['Nakuru', 'Eldoret'].some(region => i.location.includes(region))).length,
   }
 };
