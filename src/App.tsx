@@ -10,6 +10,7 @@ import Institutions from "./pages/Institutions";
 import Pathways from "./pages/Pathways";
 import BiddingPage from "./pages/BiddingPage";
 import Tracking from "./pages/Tracking";
+import AIAssessment from "./pages/AIAssessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/pathways" element={<Pathways />} />
           <Route path="/bidding" element={<BiddingPage />} />
           <Route path="/tracking" element={<Tracking />} />
+          <Route path="/ai-assessment" element={<AIAssessment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

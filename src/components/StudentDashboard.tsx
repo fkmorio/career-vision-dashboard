@@ -33,10 +33,10 @@ const StudentDashboard = () => {
       badge: "Active"
     },
     { 
-      title: "AI Competency Test", 
-      description: "Get personalized recommendations", 
+      title: "AI Competency Assessment", 
+      description: "Get personalized CBC-based recommendations", 
       icon: Brain, 
-      action: () => navigate('/pathways'),
+      action: () => navigate('/ai-assessment'),
       badge: "New"
     },
     { 
@@ -47,8 +47,8 @@ const StudentDashboard = () => {
       badge: "Pending"
     },
     { 
-      title: "Bidding Dashboard", 
-      description: "Track your placement bids", 
+      title: "KUCCPS Selection", 
+      description: "Track your placement choices", 
       icon: TrendingUp, 
       action: () => navigate('/bidding'),
       badge: "4 Active"
