@@ -1,105 +1,82 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, AlertCircle, Calendar, FileText, Users, Phone, GraduationCap, MapPin } from "lucide-react";
+import { CheckCircle, Clock, AlertCircle, Calendar, FileText, Users, Phone, GraduationCap, MapPin, Target, TrendingUp } from "lucide-react";
+import { useUser } from '../contexts/UserContext';
 
 const PlacementTracking = () => {
-  const kuccpsApplications = [
-    {
-      id: 1,
-      institution: 'University of Nairobi',
-      program: 'Bachelor of Medicine and Bachelor of Surgery',
-      code: 'J01/01/01',
-      appliedDate: '2024-05-15',
-      status: 'placed',
-      stage: 4,
-      totalStages: 4,
-      nextStep: 'Report for Admission',
-      nextDate: '2024-08-15',
-      cutoffPoints: 75,
-      yourPoints: 78,
-      priority: 1,
-      timeline: [
-        { stage: 'Application Submitted', date: '2024-05-15', completed: true },
-        { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
-        { stage: 'First Selection', date: '2024-06-15', completed: true },
-        { stage: 'Placed', date: '2024-06-20', completed: true },
-        { stage: 'Admission', date: '2024-08-15', completed: false }
-      ]
-    },
-    {
-      id: 2,
-      institution: 'JKUAT',
-      program: 'Bachelor of Science in Computer Science',
-      code: 'J07/04/02',
-      appliedDate: '2024-05-15',
-      status: 'revision',
-      stage: 3,
-      totalStages: 4,
-      nextStep: 'KUCCPS Revision Round',
-      nextDate: '2024-07-01',
-      cutoffPoints: 65,
-      yourPoints: 62,
-      priority: 2,
-      timeline: [
-        { stage: 'Application Submitted', date: '2024-05-15', completed: true },
-        { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
-        { stage: 'First Selection', date: '2024-06-15', completed: true, note: 'Below cut-off, moved to revision' },
-        { stage: 'Revision Round', date: '2024-07-01', completed: false }
-      ]
-    },
-    {
-      id: 3,
-      institution: 'Kenyatta University',
-      program: 'Bachelor of Education (Science)',
-      code: 'J03/02/01',
-      appliedDate: '2024-05-15',
-      status: 'waitlist',
-      stage: 3,
-      totalStages: 4,
-      nextStep: 'Waiting for Vacancies',
-      nextDate: 'TBD',
-      cutoffPoints: 58,
-      yourPoints: 65,
-      priority: 3,
-      timeline: [
-        { stage: 'Application Submitted', date: '2024-05-15', completed: true },
-        { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
-        { stage: 'Waitlisted', date: '2024-06-15', completed: true },
-        { stage: 'Final Placement', date: 'TBD', completed: false }
-      ]
-    },
-    {
-      id: 4,
-      institution: 'Moi University',
-      program: 'Bachelor of Science in Agriculture',
-      code: 'J02/05/01',
-      appliedDate: '2024-05-15',
-      status: 'not-selected',
-      stage: 2,
-      totalStages: 4,
-      nextStep: 'Application Closed',
-      nextDate: '-',
-      cutoffPoints: 55,
-      yourPoints: 52,
-      priority: 4,
-      timeline: [
-        { stage: 'Application Submitted', date: '2024-05-15', completed: true },
-        { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
-        { stage: 'Not Selected', date: '2024-06-15', completed: true, note: 'Below cut-off points' }
-      ]
-    }
-  ];
+  const { user } = useUser();
+
+  // Dynamic applications based on user profile
+  const generateUserApplications = () => {
+    if (!user) return [];
+
+    const baseApplications = [
+      {
+        id: 1,
+        institution: 'University of Nairobi',
+        program: user.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 'Bachelor of Arts',
+        code: 'J01/01/01',
+        appliedDate: '2024-05-15',
+        status: 'placed',
+        stage: 4,
+        totalStages: 4,
+        nextStep: 'Report for Admission',
+        nextDate: '2024-08-15',
+        cutoffPoints: user.cluster === 'STEM' ? 75 : 65,
+        yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65,
+        priority: 1,
+        matchProbability: 92,
+        timeline: [
+          { stage: 'Application Submitted', date: '2024-05-15', completed: true },
+          { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
+          { stage: 'First Selection', date: '2024-06-15', completed: true },
+          { stage: 'Placed', date: '2024-06-20', completed: true },
+          { stage: 'Admission', date: '2024-08-15', completed: false }
+        ]
+      },
+      {
+        id: 2,
+        institution: user.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
+        program: user.cluster === 'Technical' ? 'Diploma in Information Technology' : 'Bachelor of Science in Computer Science',
+        code: user.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
+        appliedDate: '2024-05-15',
+        status: 'revision',
+        stage: 3,
+        totalStages: 4,
+        nextStep: 'KUCCPS Revision Round',
+        nextDate: '2024-07-01',
+        cutoffPoints: user.cluster === 'Technical' ? 45 : 65,
+        yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 62,
+        priority: 2,
+        matchProbability: 78,
+        timeline: [
+          { stage: 'Application Submitted', date: '2024-05-15', completed: true },
+          { stage: 'KUCCPS Processing', date: '2024-06-01', completed: true },
+          { stage: 'First Selection', date: '2024-06-15', completed: true, note: 'Below cut-off, moved to revision' },
+          { stage: 'Revision Round', date: '2024-07-01', completed: false }
+        ]
+      }
+    ];
+
+    return baseApplications.map(app => ({
+      ...app,
+      yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || app.yourPoints,
+      predictedSuccess: app.yourPoints >= app.cutoffPoints ? 'High' : app.yourPoints >= app.cutoffPoints - 5 ? 'Medium' : 'Low'
+    }));
+  };
+
+  const kuccpsApplications = generateUserApplications();
 
   const helbStatus = {
-    applicationId: 'HELB2024001',
-    status: 'approved',
-    loanAmount: 'KSh 185,000',
+    applicationId: `HELB2024${user?.studentId?.slice(-3) || '001'}`,
+    status: user?.helbStatus || 'approved',
+    loanAmount: user?.cluster === 'STEM' ? 'KSh 185,000' : 'KSh 160,000',
     upkeepAmount: 'KSh 60,000',
-    disbursementDate: '2024-08-01'
+    disbursementDate: '2024-08-01',
+    eligibilityScore: user?.competencyScore >= 80 ? 95 : user?.competencyScore >= 70 ? 85 : 75
   };
 
   const getStatusColor = (status) => {
@@ -126,36 +103,111 @@ const PlacementTracking = () => {
     return (stage / totalStages) * 100;
   };
 
+  const getPredictedSuccessColor = (prediction) => {
+    switch(prediction) {
+      case 'High': return 'text-green-600';
+      case 'Medium': return 'text-yellow-600';
+      case 'Low': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">KUCCPS Placement Tracking</h1>
-        <p className="text-gray-600 mt-1">Monitor your university placement progress and HELB loan status</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {user ? `${user.name}'s Placement Tracking` : 'KUCCPS Placement Tracking'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {user 
+              ? `Monitor your ${user.cluster} cluster applications and HELB status`
+              : 'Monitor your university placement progress and HELB loan status'
+            }
+          </p>
+        </div>
+        {user && (
+          <div className="text-right">
+            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+              {user.cluster} Cluster
+            </Badge>
+            <div className="text-sm text-gray-600 mt-1">Competency Score: {user.competencyScore}</div>
+          </div>
+        )}
       </div>
+
+      {/* AI Prediction Panel */}
+      {user && (
+        <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-900">
+              <Target className="w-5 h-5 mr-2" />
+              AI Placement Predictions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {kuccpsApplications.filter(app => app.predictedSuccess === 'High').length}
+                </div>
+                <div className="text-sm text-gray-600">High Success Rate</div>
+                <div className="flex items-center justify-center mt-1">
+                  <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
+                  <span className="text-xs text-green-600">85%+ likely</span>
+                </div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">
+                  {Math.round(kuccpsApplications.reduce((acc, app) => acc + app.matchProbability, 0) / kuccpsApplications.length)}%
+                </div>
+                <div className="text-sm text-gray-600">Avg Match Rate</div>
+                <div className="text-xs text-blue-600 mt-1">Based on Profile</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-green-600">{helbStatus.eligibilityScore}%</div>
+                <div className="text-sm text-gray-600">HELB Eligibility</div>
+                <div className="text-xs text-green-600 mt-1">Funding Secured</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">A-</div>
+                <div className="text-sm text-gray-600">Predicted Final Grade</div>
+                <div className="text-xs text-orange-600 mt-1">CBC Aligned</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">4</div>
+            <div className="text-2xl font-bold text-blue-600">{kuccpsApplications.length}</div>
             <div className="text-sm text-gray-600">Programs Applied</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">1</div>
+            <div className="text-2xl font-bold text-green-600">
+              {kuccpsApplications.filter(app => app.status === 'placed').length}
+            </div>
             <div className="text-sm text-gray-600">Placed</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">1</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {kuccpsApplications.filter(app => app.status === 'revision').length}
+            </div>
             <div className="text-sm text-gray-600">In Revision</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">78</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {user ? user.kcseGrade : '78'}
+            </div>
             <div className="text-sm text-gray-600">Your KCSE Points</div>
           </CardContent>
         </Card>
@@ -166,22 +218,24 @@ const PlacementTracking = () => {
         <CardHeader>
           <CardTitle className="flex items-center text-green-900">
             <GraduationCap className="w-5 h-5 mr-2" />
-            HELB Loan Status
+            HELB Loan Status {user && `- ${user.name}`}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="font-medium text-green-800">Application Status</div>
-              <Badge className="bg-green-100 text-green-800 mt-1">Approved</Badge>
+              <Badge className="bg-green-100 text-green-800 mt-1">
+                {helbStatus.status.charAt(0).toUpperCase() + helbStatus.status.slice(1)}
+              </Badge>
             </div>
             <div className="text-center">
               <div className="font-medium text-green-800">Loan Amount</div>
               <div className="text-lg font-bold text-green-600">{helbStatus.loanAmount}</div>
             </div>
             <div className="text-center">
-              <div className="font-medium text-green-800">Upkeep Allowance</div>
-              <div className="text-lg font-bold text-green-600">{helbStatus.upkeepAmount}</div>
+              <div className="font-medium text-green-800">Eligibility Score</div>
+              <div className="text-lg font-bold text-green-600">{helbStatus.eligibilityScore}%</div>
             </div>
             <div className="text-center">
               <div className="font-medium text-green-800">Disbursement Date</div>
@@ -232,7 +286,7 @@ const PlacementTracking = () => {
 
       {/* Application Details */}
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">KUCCPS Application Status</h2>
+        <h2 className="text-xl font-semibold">Your KUCCPS Applications</h2>
         {kuccpsApplications.map((application) => (
           <Card key={application.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
@@ -244,15 +298,21 @@ const PlacementTracking = () => {
                       {getStatusIcon(application.status)}
                       <span className="ml-1 capitalize">{application.status.replace('-', ' ')}</span>
                     </Badge>
+                    <Badge className={`${getPredictedSuccessColor(application.predictedSuccess)} bg-gray-100`}>
+                      {application.predictedSuccess} Success Rate
+                    </Badge>
                   </div>
                   <CardDescription className="mt-1">
                     {application.institution} • Code: {application.code} • Priority #{application.priority}
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">Your Points</div>
+                  <div className="text-sm text-gray-600">Your Points vs Cut-off</div>
                   <div className={`font-bold ${application.yourPoints >= application.cutoffPoints ? 'text-green-600' : 'text-red-600'}`}>
                     {application.yourPoints} / {application.cutoffPoints}
+                  </div>
+                  <div className="text-xs text-purple-600 mt-1">
+                    Match: {application.matchProbability}%
                   </div>
                 </div>
               </div>

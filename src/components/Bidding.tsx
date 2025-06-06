@@ -5,80 +5,100 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star } from "lucide-react";
+import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star, Target, Brain } from "lucide-react";
+import { useUser } from '../contexts/UserContext';
 
 const Bidding = () => {
+  const { user } = useUser();
   const [activeBids, setActiveBids] = useState([]);
   const [selectedPriority, setSelectedPriority] = useState({});
 
-  const kuccpsOpportunities = [
-    {
-      id: 1,
-      institution: 'University of Nairobi',
-      program: 'Bachelor of Medicine and Bachelor of Surgery',
-      code: 'J01/01/01',
-      type: 'Degree',
-      location: 'Nairobi',
-      cutoffPoints: { current: 75, minimum: 70, maximum: 84 },
-      currentCutoff: 75,
-      minCutoff: 70,
-      maxCutoff: 84,
-      deadline: '2024-06-15',
-      timeLeft: '3 days',
-      totalBidders: 2840,
-      capacity: 150,
-      clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
-      description: 'Premier medical program with clinical training at Kenyatta National Hospital.',
-      status: 'active',
-      userBid: null,
-      helbEligible: true,
-      scholarships: ['Merit-based', 'Need-based']
-    },
-    {
-      id: 2,
-      institution: 'JKUAT',
-      program: 'Bachelor of Science in Computer Science',
-      code: 'J07/04/02',
-      type: 'Degree',
-      location: 'Kiambu',
-      cutoffPoints: { current: 65, minimum: 58, maximum: 72 },
-      currentCutoff: 65,
-      minCutoff: 58,
-      maxCutoff: 72,
-      deadline: '2024-06-12',
-      timeLeft: '8 hours',
-      totalBidders: 1560,
-      capacity: 120,
-      clusters: ['Mathematics', 'Physics', 'Computer Studies'],
-      description: 'Technology-focused program with industry partnerships and internships.',
-      status: 'urgent',
-      userBid: 62,
-      helbEligible: true,
-      scholarships: ['Tech Innovation Fund']
-    },
-    {
-      id: 3,
-      institution: 'Strathmore University',
-      program: 'Bachelor of Business Science',
-      code: 'P15/03/01',
-      type: 'Degree',
-      location: 'Nairobi',
-      cutoffPoints: { current: 68, minimum: 60, maximum: 75 },
-      currentCutoff: 68,
-      minCutoff: 60,
-      maxCutoff: 75,
-      deadline: '2024-06-20',
-      timeLeft: '1 week',
-      totalBidders: 980,
-      capacity: 80,
-      clusters: ['Mathematics', 'Business Studies', 'Economics'],
-      description: 'Business program with strong industry connections and entrepreneurship focus.',
-      status: 'active',
-      userBid: null,
-      helbEligible: false,
-      scholarships: ['Academic Excellence', 'Leadership']
-    }
-  ];
+  // Generate dynamic opportunities based on user profile
+  const generateUserOpportunities = () => {
+    if (!user) return [];
+
+    const userPoints = parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65;
+    
+    const baseOpportunities = [
+      {
+        id: 1,
+        institution: 'University of Nairobi',
+        program: user.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 
+                 user.cluster === 'Business' ? 'Bachelor of Commerce' : 'Bachelor of Arts',
+        code: 'J01/01/01',
+        type: 'Degree',
+        location: 'Nairobi',
+        cutoffPoints: { 
+          current: user.cluster === 'STEM' ? 75 : user.cluster === 'Business' ? 68 : 62, 
+          minimum: user.cluster === 'STEM' ? 70 : user.cluster === 'Business' ? 62 : 55, 
+          maximum: user.cluster === 'STEM' ? 84 : user.cluster === 'Business' ? 75 : 68 
+        },
+        deadline: '2024-06-15',
+        timeLeft: '3 days',
+        totalBidders: user.cluster === 'STEM' ? 2840 : 1840,
+        capacity: user.cluster === 'STEM' ? 150 : 200,
+        clusters: user.cluster === 'STEM' ? ['Mathematics', 'Physics', 'Chemistry', 'Biology'] :
+                  user.cluster === 'Business' ? ['Mathematics', 'Business Studies', 'Economics'] :
+                  ['English', 'Literature', 'History', 'Geography'],
+        description: `Premier ${user.cluster.toLowerCase()} program with excellent career prospects.`,
+        status: 'active',
+        userBid: null,
+        helbEligible: true,
+        scholarships: ['Merit-based', 'Need-based'],
+        matchScore: calculateMatchScore(userPoints, user.cluster, 'University'),
+        competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High'
+      },
+      {
+        id: 2,
+        institution: user.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
+        program: user.cluster === 'Technical' ? 'Diploma in Information Technology' : 
+                 'Bachelor of Science in Computer Science',
+        code: user.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
+        type: user.cluster === 'Technical' ? 'Diploma' : 'Degree',
+        location: 'Kiambu',
+        cutoffPoints: { 
+          current: user.cluster === 'Technical' ? 45 : 65, 
+          minimum: user.cluster === 'Technical' ? 40 : 58, 
+          maximum: user.cluster === 'Technical' ? 55 : 72 
+        },
+        deadline: '2024-06-12',
+        timeLeft: '8 hours',
+        totalBidders: 1560,
+        capacity: 120,
+        clusters: user.cluster === 'Technical' ? ['Mathematics', 'Physics', 'Computer Studies'] :
+                  ['Mathematics', 'Physics', 'Computer Studies'],
+        description: 'Technology-focused program with industry partnerships and internships.',
+        status: 'urgent',
+        userBid: null,
+        helbEligible: true,
+        scholarships: ['Tech Innovation Fund'],
+        matchScore: calculateMatchScore(userPoints, user.cluster, user.cluster === 'Technical' ? 'TVET' : 'University'),
+        competitiveness: userPoints >= (user.cluster === 'Technical' ? 50 : 70) ? 'Low' : 'Medium'
+      }
+    ];
+
+    return baseOpportunities.filter(opp => 
+      userPoints >= opp.cutoffPoints.minimum - 10 // Show opportunities within reach
+    );
+  };
+
+  const calculateMatchScore = (userPoints, cluster, institutionType) => {
+    let score = 60;
+    
+    // Points alignment
+    if (userPoints >= 75) score += 20;
+    else if (userPoints >= 65) score += 15;
+    else if (userPoints >= 55) score += 10;
+    
+    // Cluster alignment
+    if (cluster === 'STEM' && institutionType === 'University') score += 15;
+    if (cluster === 'Technical' && institutionType === 'TVET') score += 20;
+    if (cluster === 'Business' && institutionType === 'University') score += 10;
+    
+    return Math.min(score, 98);
+  };
+
+  const kuccpsOpportunities = generateUserOpportunities();
 
   const placeBid = (opportunityId, priority) => {
     setSelectedPriority(prev => ({ ...prev, [opportunityId]: priority }));
@@ -98,12 +118,84 @@ const Bidding = () => {
     }
   };
 
+  const getCompetitivenessColor = (competitiveness) => {
+    switch(competitiveness) {
+      case 'Low': return 'text-green-600';
+      case 'Medium': return 'text-yellow-600';
+      case 'High': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
+  };
+
+  const userPoints = user ? parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65 : 65;
+  const matchProbability = kuccpsOpportunities.length > 0 
+    ? Math.round(kuccpsOpportunities.reduce((acc, opp) => acc + opp.matchScore, 0) / kuccpsOpportunities.length)
+    : 78;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">KUCCPS Program Selection</h1>
-        <p className="text-gray-600 mt-1">Select and prioritize your preferred university programs through KUCCPS</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {user ? `KUCCPS Selection for ${user.name}` : 'KUCCPS Program Selection'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {user 
+              ? `AI-curated programs for your ${user.cluster} cluster and ${user.kcseGrade} performance`
+              : 'Select and prioritize your preferred university programs through KUCCPS'
+            }
+          </p>
+        </div>
+        {user && (
+          <div className="text-right">
+            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+              <Brain className="w-4 h-4 mr-1" />
+              AI Optimized
+            </Badge>
+            <div className="text-sm text-gray-600 mt-1">Competency: {user.competencyScore}</div>
+          </div>
+        )}
       </div>
+
+      {/* AI Recommendations Panel */}
+      {user && (
+        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-indigo-900">
+              <Target className="w-5 h-5 mr-2" />
+              AI Selection Optimization
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-indigo-600">{matchProbability}%</div>
+                <div className="text-sm text-gray-600">Overall Match Rate</div>
+                <div className="text-xs text-indigo-600 mt-1">AI Calculated</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-green-600">
+                  {kuccpsOpportunities.filter(opp => opp.matchScore >= 80).length}
+                </div>
+                <div className="text-sm text-gray-600">High Match Programs</div>
+                <div className="text-xs text-green-600 mt-1">80%+ compatibility</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{user.cluster}</div>
+                <div className="text-sm text-gray-600">Your Cluster</div>
+                <div className="text-xs text-blue-600 mt-1">Optimized Selection</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {kuccpsOpportunities.filter(opp => opp.competitiveness === 'Low').length}
+                </div>
+                <div className="text-sm text-gray-600">Safe Choices</div>
+                <div className="text-xs text-purple-600 mt-1">Low Competition</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -115,19 +207,23 @@ const Bidding = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">2</div>
+            <div className="text-2xl font-bold text-green-600">
+              {Object.keys(selectedPriority).length}
+            </div>
             <div className="text-sm text-gray-600">Programs Selected</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600">B (65)</div>
+            <div className="text-2xl font-bold text-orange-600">
+              {user ? user.kcseGrade : 'B (65)'}
+            </div>
             <div className="text-sm text-gray-600">Your KCSE Points</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">78%</div>
+            <div className="text-2xl font-bold text-purple-600">{matchProbability}%</div>
             <div className="text-sm text-gray-600">Match Probability</div>
           </CardContent>
         </Card>
@@ -141,8 +237,10 @@ const Bidding = () => {
             <div className="space-y-1">
               <div className="font-medium text-blue-900">KUCCPS Selection Guidelines</div>
               <div className="text-sm text-blue-700">
-                Select up to 6 programs in order of preference. KUCCPS will place you in the highest-preference program 
-                where you meet the cut-off points. Consider your KCSE performance, subject cluster, and career goals.
+                {user 
+                  ? `Based on your ${user.cluster} cluster and ${user.kcseGrade} performance, we've curated the best matching programs. AI has optimized your selection for maximum placement probability.`
+                  : 'Select up to 6 programs in order of preference. KUCCPS will place you in the highest-preference program where you meet the cut-off points. Consider your KCSE performance, subject cluster, and career goals.'
+                }
               </div>
             </div>
           </div>
@@ -152,15 +250,27 @@ const Bidding = () => {
       {/* Available Programs */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Available Programs</h2>
+          <h2 className="text-xl font-semibold">
+            {user ? 'AI-Recommended Programs' : 'Available Programs'}
+          </h2>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">AI Match Score:</span>
-            <Badge className="bg-green-100 text-green-800">85% Compatible</Badge>
+            <Badge className="bg-green-100 text-green-800">{matchProbability}% Compatible</Badge>
           </div>
         </div>
         
-        {kuccpsOpportunities.map((program) => (
-          <Card key={program.id} className="hover:shadow-lg transition-shadow">
+        {kuccpsOpportunities
+          .sort((a, b) => b.matchScore - a.matchScore)
+          .map((program) => (
+          <Card key={program.id} className="hover:shadow-lg transition-shadow relative">
+            {program.matchScore >= 85 && (
+              <div className="absolute top-2 right-2">
+                <Badge className="bg-green-600 text-white">
+                  <Star className="w-3 h-3 mr-1" />
+                  Top Match
+                </Badge>
+              </div>
+            )}
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -174,15 +284,21 @@ const Bidding = () => {
                         HELB Eligible
                       </Badge>
                     )}
+                    <Badge className={`bg-gray-100 ${getCompetitivenessColor(program.competitiveness)}`}>
+                      {program.competitiveness} Competition
+                    </Badge>
                   </div>
                   <CardDescription className="mt-1">
                     {program.institution} • {program.location} • Code: {program.code}
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-600">Current Cut-off</div>
-                  <div className="font-bold text-green-600">
-                    {program.currentCutoff} points
+                  <div className="text-sm text-gray-600">AI Match Score</div>
+                  <div className="font-bold text-purple-600">
+                    {program.matchScore}%
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1">
+                    Cut-off: {program.cutoffPoints.current} pts
                   </div>
                 </div>
               </div>
@@ -272,7 +388,7 @@ const Bidding = () => {
               {/* Selection Actions */}
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="text-sm text-gray-600">
-                  Capacity: {program.capacity} students
+                  Capacity: {program.capacity} students • Competition: {program.competitiveness}
                 </div>
                 <div className="space-x-2">
                   <Button variant="outline" size="sm">

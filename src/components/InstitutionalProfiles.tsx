@@ -1,8 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Download, Database } from "lucide-react";
+import { Brain, Download, Database, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useUser } from '../contexts/UserContext';
 import CBALevelsCard from './institutions/CBALevelsCard';
 import AIRecommendationsPanel from './institutions/AIRecommendationsPanel';
 import InstitutionFilters from './institutions/InstitutionFilters';
@@ -12,11 +13,59 @@ import DatabaseReporting from './institutions/DatabaseReporting';
 import { kenyanInstitutions, cbaLevels, aiRecommendations } from './institutions/institutionData';
 
 const InstitutionalProfiles = () => {
+  const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
 
-  const filteredInstitutions = kenyanInstitutions.filter(institution => {
+  // Dynamic filtering based on user profile
+  const getRecommendedInstitutions = () => {
+    if (!user) return kenyanInstitutions;
+    
+    // Filter institutions based on user's KCSE grade and cluster
+    return kenyanInstitutions.filter(institution => {
+      const userGradePoints = parseFloat(user.kcseGrade.replace(/[^\d.]/g, '')) || 50;
+      const institutionRequirement = cbaLevels[institution.cbaRequirement];
+      
+      // Simple scoring based on competency and cluster alignment
+      return userGradePoints >= (institutionRequirement.minPoints || 40);
+    }).map(institution => ({
+      ...institution,
+      matchScore: calculateMatchScore(institution, user),
+      recommendationReason: getRecommendationReason(institution, user)
+    }));
+  };
+
+  const calculateMatchScore = (institution, user) => {
+    let score = 70; // Base score
+    
+    // Boost score for cluster alignment
+    if (user.cluster === 'STEM' && institution.sector === 'University') score += 15;
+    if (user.cluster === 'Technical' && institution.sector === 'TVET') score += 20;
+    if (user.cluster === 'Business' && institution.name.toLowerCase().includes('business')) score += 10;
+    
+    // Boost for competency score alignment
+    if (user.competencyScore >= 85) score += 10;
+    if (user.competencyScore >= 90) score += 5;
+    
+    return Math.min(score, 98);
+  };
+
+  const getRecommendationReason = (institution, user) => {
+    const reasons = [];
+    if (user.cluster === 'STEM' && institution.sector === 'University') {
+      reasons.push('Strong STEM programs');
+    }
+    if (user.competencyScore >= 85) {
+      reasons.push('Matches your high competency level');
+    }
+    if (institution.helbEligible) {
+      reasons.push('HELB funding available');
+    }
+    return reasons.join(', ') || 'Good academic fit';
+  };
+
+  const filteredInstitutions = getRecommendedInstitutions().filter(institution => {
     const matchesSearch = institution.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          institution.sector.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          institution.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -100,10 +149,23 @@ Generated on: ${new Date().toLocaleDateString()}
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kenyan Universities & Institutions</h1>
-          <p className="text-gray-600 mt-1">Comprehensive database including Universities, Polytechnics, and TVET colleges</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {user ? `Recommended Institutions for ${user.name}` : 'Kenyan Universities & Institutions'}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {user 
+              ? `Personalized recommendations based on your ${user.cluster} cluster and ${user.kcseGrade} performance`
+              : 'Comprehensive database including Universities, Polytechnics, and TVET colleges'
+            }
+          </p>
         </div>
         <div className="flex space-x-2">
+          {user && (
+            <Badge className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
+              <Target className="w-3 h-3 mr-1" />
+              {filteredInstitutions.filter(i => i.matchScore >= 85).length} Top Matches
+            </Badge>
+          )}
           <Button 
             onClick={downloadDocumentation}
             variant="outline"
@@ -132,7 +194,9 @@ Generated on: ${new Date().toLocaleDateString()}
 
       <Tabs defaultValue="institutions" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="institutions">Institution Profiles</TabsTrigger>
+          <TabsTrigger value="institutions">
+            {user ? 'Your Matches' : 'Institution Profiles'}
+          </TabsTrigger>
           <TabsTrigger value="database">Database & Reports</TabsTrigger>
           <TabsTrigger value="insights">Placement Insights</TabsTrigger>
         </TabsList>
@@ -147,12 +211,34 @@ Generated on: ${new Date().toLocaleDateString()}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredInstitutions.map((institution) => (
-              <InstitutionCard 
-                key={institution.id} 
-                institution={institution} 
-                cbaLevels={cbaLevels} 
-              />
+            {filteredInstitutions
+              .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0))
+              .map((institution) => (
+              <div key={institution.id} className="relative">
+                <InstitutionCard 
+                  institution={institution} 
+                  cbaLevels={cbaLevels} 
+                />
+                {user && institution.matchScore && (
+                  <div className="absolute top-2 right-2">
+                    <Badge 
+                      className={`${
+                        institution.matchScore >= 90 ? 'bg-green-600' :
+                        institution.matchScore >= 80 ? 'bg-blue-600' :
+                        institution.matchScore >= 70 ? 'bg-yellow-600' :
+                        'bg-gray-600'
+                      } text-white`}
+                    >
+                      {institution.matchScore}% Match
+                    </Badge>
+                  </div>
+                )}
+                {user && institution.recommendationReason && (
+                  <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-800">
+                    <strong>Why recommended:</strong> {institution.recommendationReason}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </TabsContent>
