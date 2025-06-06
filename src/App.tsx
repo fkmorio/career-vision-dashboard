@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider, useUser } from "./contexts/UserContext";
+import { FeatureFlagsProvider } from "./contexts/FeatureFlagsContext";
 import WelcomeSetup from "./components/WelcomeSetup";
 import Index from "./pages/Index";
 import Insights from "./pages/Insights";
@@ -14,6 +15,7 @@ import BiddingPage from "./pages/BiddingPage";
 import Tracking from "./pages/Tracking";
 import AIAssessment from "./pages/AIAssessment";
 import InteractiveAIPage from "./pages/InteractiveAI";
+import FeatureFlagsPage from "./pages/FeatureFlagsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,7 @@ const AppContent = () => {
         <Route path="/tracking" element={<Tracking />} />
         <Route path="/ai-assessment" element={<AIAssessment />} />
         <Route path="/interactive-ai" element={<InteractiveAIPage />} />
+        <Route path="/feature-flags" element={<FeatureFlagsPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -47,9 +50,11 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <UserProvider>
-        <Toaster />
-        <Sonner />
-        <AppContent />
+        <FeatureFlagsProvider>
+          <Toaster />
+          <Sonner />
+          <AppContent />
+        </FeatureFlagsProvider>
       </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>

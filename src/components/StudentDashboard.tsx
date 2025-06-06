@@ -1,16 +1,19 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut } from "lucide-react";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import FeatureFlag from './FeatureFlag';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useUser();
+  const { isEnabled: gamificationEnabled } = useFeatureFlag('gamification-system');
+  const { isEnabled: enhancedAIEnabled, variant: aiVariant } = useFeatureFlag('enhanced-ai-recommendations');
 
   if (!user) {
     return null; // This will be handled by the main App component
@@ -26,10 +29,12 @@ const StudentDashboard = () => {
     },
     { 
       title: "AI Competency Assessment", 
-      description: "Get personalized CBC-based recommendations", 
+      description: enhancedAIEnabled 
+        ? `Get ${aiVariant === 'A' ? 'advanced' : 'enhanced'} CBC-based recommendations` 
+        : "Get personalized CBC-based recommendations", 
       icon: Brain, 
       action: () => navigate('/ai-assessment'),
-      badge: "New"
+      badge: enhancedAIEnabled ? (aiVariant === 'A' ? 'Advanced' : 'Enhanced') : "New"
     },
     { 
       title: "Interactive AI Assistant", 
@@ -74,12 +79,70 @@ const StudentDashboard = () => {
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
             {user.kuccpsStatus}
           </Badge>
+          <Button variant="outline" size="sm" onClick={() => navigate('/feature-flags')} className="text-blue-600 hover:text-blue-700">
+            <Flag className="w-4 h-4 mr-2" />
+            Feature Flags
+          </Button>
           <Button variant="outline" size="sm" onClick={logout} className="text-red-600 hover:text-red-700">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
           </Button>
         </div>
       </div>
+
+      {/* Gamification Feature Flag Demo */}
+      <FeatureFlag flag="gamification-system">
+        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-800">
+              <Award className="w-5 h-5 mr-2" />
+              Achievement System (Beta)
+            </CardTitle>
+            <CardDescription>You're part of our gamification pilot program!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">1,250</div>
+                <div className="text-sm text-gray-600">Points Earned</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-gold-600">🏆</div>
+                <div className="text-sm text-gray-600">3 Achievements</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">Level 5</div>
+                <div className="text-sm text-gray-600">Current Level</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </FeatureFlag>
+
+      {/* Enhanced AI Recommendations Feature Flag Demo */}
+      <FeatureFlag flag="enhanced-ai-recommendations" variant="B">
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-800">
+              <Brain className="w-5 h-5 mr-2" />
+              Enhanced AI Recommendations (Variant B)
+            </CardTitle>
+            <CardDescription>You're experiencing our improved AI recommendation system!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="p-3 bg-white rounded border-l-4 border-blue-500">
+                <div className="font-medium">Smart Career Match</div>
+                <div className="text-sm text-gray-600">Based on your STEM cluster and 92% competency score, consider Computer Science programs at top universities.</div>
+              </div>
+              <div className="p-3 bg-white rounded border-l-4 border-green-500">
+                <div className="font-medium">Scholarship Opportunity</div>
+                <div className="text-sm text-gray-600">You're eligible for 3 STEM scholarships. Apply now to increase your chances!</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </FeatureFlag>
 
       {/* Profile Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
