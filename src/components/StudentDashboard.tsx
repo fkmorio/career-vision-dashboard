@@ -4,25 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare } from "lucide-react";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const { user, logout } = useUser();
 
-  const studentData = {
-    name: "Wanjiku Mwangi",
-    studentId: "KCSE2024001",
-    school: "Nairobi Girls High School",
-    kcseGrade: "B (Mean Grade 8.2)",
-    cluster: "Mathematics & Physical Sciences",
-    kuccpsStatus: "Active - Bidding Open",
-    helbStatus: "Application Submitted",
-    competencyScore: 85,
-    applications: 6,
-    bids: 4,
-    interviews: 2
-  };
+  if (!user) {
+    return null; // This will be handled by the main App component
+  }
 
   const quickActions = [
     { 
@@ -51,7 +43,7 @@ const StudentDashboard = () => {
       description: "Track your placement choices", 
       icon: TrendingUp, 
       action: () => navigate('/bidding'),
-      badge: "4 Active"
+      badge: `${user.bids} Active`
     }
   ];
 
@@ -62,16 +54,31 @@ const StudentDashboard = () => {
     { name: "Digital Literacy", level: "Expert", color: "bg-orange-100 text-orange-800" }
   ];
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Habari za asubuhi";
+    if (hour < 17) return "Habari za mchana";
+    return "Habari za jioni";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Karibu, {studentData.name}!</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {getGreeting()}, {user.name}! 🌟
+          </h1>
           <p className="text-gray-600 mt-1">Track your tertiary education placement journey through KUCCPS</p>
         </div>
-        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-          {studentData.kuccpsStatus}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+            {user.kuccpsStatus}
+          </Badge>
+          <Button variant="outline" size="sm" onClick={logout} className="text-red-600 hover:text-red-700">
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* Profile Overview */}
@@ -86,19 +93,19 @@ const StudentDashboard = () => {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">KCSE Grade:</span>
-              <span className="font-medium text-green-600">{studentData.kcseGrade}</span>
+              <span className="font-medium text-green-600">Grade {user.kcseGrade}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">School:</span>
-              <span className="font-medium text-sm">{studentData.school}</span>
+              <span className="font-medium text-sm">{user.school}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Cluster:</span>
-              <span className="font-medium text-sm">{studentData.cluster}</span>
+              <span className="font-medium text-sm">{user.cluster}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Competency Score:</span>
-              <span className="font-medium text-blue-600">{studentData.competencyScore}/100</span>
+              <span className="font-medium text-blue-600">{user.competencyScore}/100</span>
             </div>
           </CardContent>
         </Card>
@@ -112,17 +119,17 @@ const StudentDashboard = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{studentData.applications}</div>
+              <div className="text-2xl font-bold text-blue-600">{user.applications}</div>
               <div className="text-sm text-gray-600">KUCCPS Applications</div>
             </div>
             <Progress value={75} className="h-2" />
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="text-center">
-                <div className="font-semibold text-orange-600">{studentData.bids}</div>
+                <div className="font-semibold text-orange-600">{user.bids}</div>
                 <div className="text-gray-600">Active Bids</div>
               </div>
               <div className="text-center">
-                <div className="font-semibold text-green-600">{studentData.interviews}</div>
+                <div className="font-semibold text-green-600">{user.interviews}</div>
                 <div className="text-gray-600">Interviews</div>
               </div>
             </div>
@@ -141,7 +148,7 @@ const StudentDashboard = () => {
               </div>
               <div className="flex items-center justify-between p-2 bg-green-50 rounded">
                 <span className="text-sm">HELB Decision</span>
-                <span className="text-xs text-green-600">Approved</span>
+                <span className="text-xs text-green-600">{user.helbStatus}</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
                 <span className="text-sm">AI Assessment</span>
