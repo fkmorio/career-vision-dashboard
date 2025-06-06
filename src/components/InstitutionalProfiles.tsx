@@ -12,6 +12,28 @@ import PlacementInsightsPanel from './institutions/PlacementInsightsPanel';
 import DatabaseReporting from './institutions/DatabaseReporting';
 import { kenyanInstitutions, cbaLevels, aiRecommendations } from './institutions/institutionData';
 
+interface EnhancedInstitution {
+  id: number;
+  name: string;
+  logo: string;
+  sector: string;
+  location: string;
+  rating: number;
+  students: string;
+  description: string;
+  kuccpsCode: string;
+  cutoffPoints: { min: string; max: string; avg: string };
+  cbaRequirement: string;
+  openings: number;
+  clusters: string[];
+  programs: string[];
+  helbEligible: boolean;
+  scholarships: string[];
+  facilities: string[];
+  matchScore?: number;
+  recommendationReason?: string;
+}
+
 const InstitutionalProfiles = () => {
   const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,8 +41,8 @@ const InstitutionalProfiles = () => {
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
 
   // Dynamic filtering based on user profile
-  const getRecommendedInstitutions = () => {
-    if (!user) return kenyanInstitutions;
+  const getRecommendedInstitutions = (): EnhancedInstitution[] => {
+    if (!user) return kenyanInstitutions as EnhancedInstitution[];
     
     // Filter institutions based on user's KCSE grade and cluster
     return kenyanInstitutions.filter(institution => {
@@ -28,7 +50,7 @@ const InstitutionalProfiles = () => {
       const institutionRequirement = cbaLevels[institution.cbaRequirement];
       
       // Simple scoring based on competency and cluster alignment
-      return userGradePoints >= (institutionRequirement.minPoints || 40);
+      return userGradePoints >= (institutionRequirement?.minPoints || 40);
     }).map(institution => ({
       ...institution,
       matchScore: calculateMatchScore(institution, user),
@@ -36,12 +58,12 @@ const InstitutionalProfiles = () => {
     }));
   };
 
-  const calculateMatchScore = (institution, user) => {
+  const calculateMatchScore = (institution: any, user: any): number => {
     let score = 70; // Base score
     
     // Boost score for cluster alignment
-    if (user.cluster === 'STEM' && institution.sector === 'University') score += 15;
-    if (user.cluster === 'Technical' && institution.sector === 'TVET') score += 20;
+    if (user.cluster === 'STEM' && institution.sector === 'Public University') score += 15;
+    if (user.cluster === 'Technical' && institution.sector.includes('TVET')) score += 20;
     if (user.cluster === 'Business' && institution.name.toLowerCase().includes('business')) score += 10;
     
     // Boost for competency score alignment
@@ -51,9 +73,9 @@ const InstitutionalProfiles = () => {
     return Math.min(score, 98);
   };
 
-  const getRecommendationReason = (institution, user) => {
+  const getRecommendationReason = (institution: any, user: any): string => {
     const reasons = [];
-    if (user.cluster === 'STEM' && institution.sector === 'University') {
+    if (user.cluster === 'STEM' && institution.sector === 'Public University') {
       reasons.push('Strong STEM programs');
     }
     if (user.competencyScore >= 85) {
@@ -163,7 +185,7 @@ Generated on: ${new Date().toLocaleDateString()}
           {user && (
             <Badge className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
               <Target className="w-3 h-3 mr-1" />
-              {filteredInstitutions.filter(i => i.matchScore >= 85).length} Top Matches
+              {filteredInstitutions.filter(i => (i.matchScore || 0) >= 85).length} Top Matches
             </Badge>
           )}
           <Button 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -338,22 +337,22 @@ const Bidding = () => {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Current Cut-off Points:</span>
                   <span className="font-bold text-green-600">
-                    {program.currentCutoff} points
+                    {program.cutoffPoints.current} points
                   </span>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Cut-off Range</span>
-                    <span>{Math.round(getBidProgress(program.currentCutoff, program.minCutoff, program.maxCutoff))}%</span>
+                    <span>{Math.round(getBidProgress(program.cutoffPoints.current, program.cutoffPoints.minimum, program.cutoffPoints.maximum))}%</span>
                   </div>
                   <Progress 
-                    value={getBidProgress(program.currentCutoff, program.minCutoff, program.maxCutoff)} 
+                    value={getBidProgress(program.cutoffPoints.current, program.cutoffPoints.minimum, program.cutoffPoints.maximum)} 
                     className="h-2"
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>{program.minCutoff} pts (Min)</span>
-                    <span>{program.maxCutoff} pts (Historical Max)</span>
+                    <span>{program.cutoffPoints.minimum} pts (Min)</span>
+                    <span>{program.cutoffPoints.maximum} pts (Historical Max)</span>
                   </div>
                 </div>
 
