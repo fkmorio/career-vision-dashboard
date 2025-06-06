@@ -349,6 +349,25 @@ export const kenyanInstitutions: Institution[] = [
     helbEligible: true,
     scholarships: ['Tourism Board Scholarships', 'Marine Industry Grants', 'Coastal Development Fund'],
     facilities: ['Marine Training Center', 'Hospitality Training Kitchen', 'Computer Labs', 'Tourism Center']
+  },
+  {
+    id: 18,
+    name: 'Kabarak University TVET',
+    logo: '/placeholder.svg',
+    sector: 'Private TVET',
+    location: 'Nakuru',
+    rating: 4.3,
+    students: '3,800+',
+    description: 'Faith-based technical training institution with emphasis on practical skills and ethical leadership.',
+    kuccpsCode: '05400',
+    cutoffPoints: { min: 'D+', max: 'C', avg: 'C-' },
+    cbaRequirement: 'level2',
+    openings: 1050,
+    clusters: ['Technical Education', 'Hospitality & Tourism', 'Agriculture Technology', 'Business Technology'],
+    programs: ['Technical Education', 'Hospitality Management', 'Agricultural Technology', 'Business Technology'],
+    helbEligible: true,
+    scholarships: ['Faith-based Scholarships', 'Skills Development Fund', 'Leadership Awards'],
+    facilities: ['Modern Technical Labs', 'Hospitality Training Center', 'Agricultural Technology Center', 'Business Innovation Hub']
   }
 ];
 
