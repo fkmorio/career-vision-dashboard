@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings } from "lucide-react";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import FeatureFlag from './FeatureFlag';
@@ -49,6 +49,13 @@ const StudentDashboard = () => {
       icon: TrendingUp, 
       action: () => navigate('/bidding'),
       badge: `${user.bids} Active`
+    },
+    { 
+      title: "Share Feedback", 
+      description: "Help us improve your experience", 
+      icon: HeartHandshake, 
+      action: () => navigate('/feedback'),
+      badge: "New"
     }
   ];
 
