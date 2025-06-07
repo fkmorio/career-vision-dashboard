@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake } from "lucide-react";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake, GraduationCap, BookCheck } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import FeatureFlag from './FeatureFlag';
@@ -21,6 +21,20 @@ const StudentDashboard = () => {
 
   const quickActions = [
     { 
+      title: "CBC Pathway Explorer", 
+      description: "Discover your ideal Senior Secondary pathway using AI", 
+      icon: GraduationCap, 
+      action: () => navigate('/cbc-pathways'),
+      badge: "CBC Aligned"
+    },
+    { 
+      title: "CBC Assessment Portal", 
+      description: "Track competency-based assessments and portfolio", 
+      icon: BookCheck, 
+      action: () => navigate('/cbc-assessment'),
+      badge: "New"
+    },
+    { 
       title: "KUCCPS Placement", 
       description: "Apply for university programs", 
       icon: FileText, 
@@ -34,7 +48,7 @@ const StudentDashboard = () => {
         : "Get personalized CBC-based recommendations", 
       icon: Brain, 
       action: () => navigate('/ai-assessment'),
-      badge: enhancedAIEnabled ? (aiVariant === 'A' ? 'Advanced' : 'Enhanced') : "New"
+      badge: enhancedAIEnabled ? (aiVariant === 'A' ? 'Advanced' : 'Enhanced') : "Featured"
     },
     { 
       title: "Interactive AI Assistant", 
@@ -55,7 +69,7 @@ const StudentDashboard = () => {
       description: "Help us improve your experience", 
       icon: HeartHandshake, 
       action: () => navigate('/feedback'),
-      badge: "New"
+      badge: "Community"
     }
   ];
 
@@ -80,11 +94,14 @@ const StudentDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">
             {getGreeting()}, {user.name}! 🌟
           </h1>
-          <p className="text-gray-600 mt-1">Track your tertiary education placement journey through KUCCPS</p>
+          <p className="text-gray-600 mt-1">Track your CBC journey and tertiary education placement through KUCCPS</p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
             {user.kuccpsStatus}
+          </Badge>
+          <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
+            CBC Grade 9
           </Badge>
           <Button variant="outline" size="sm" onClick={() => navigate('/feature-flags')} className="text-blue-600 hover:text-blue-700">
             <Flag className="w-4 h-4 mr-2" />
@@ -96,6 +113,43 @@ const StudentDashboard = () => {
           </Button>
         </div>
       </div>
+
+      {/* CBC Transition Alert */}
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center text-blue-900">
+            <GraduationCap className="w-5 h-5 mr-2" />
+            CBC Pathway Selection (Grade 9 → Grade 10)
+          </CardTitle>
+          <CardDescription>Choose your Senior Secondary School pathway before Grade 10 transition</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-xl font-bold text-blue-600">STEM</div>
+              <div className="text-xs text-gray-600">Science & Technology</div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-xl font-bold text-green-600">Arts</div>
+              <div className="text-xs text-gray-600">Social Sciences & Arts</div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-xl font-bold text-orange-600">Sports</div>
+              <div className="text-xs text-gray-600">Sports & Performing Arts</div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-xl font-bold text-purple-600">TVET</div>
+              <div className="text-xs text-gray-600">Technical & Vocational</div>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={() => navigate('/cbc-pathways')} className="bg-gradient-to-r from-blue-600 to-purple-600">
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Explore CBC Pathways
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Gamification Feature Flag Demo */}
       <FeatureFlag flag="gamification-system">
@@ -157,12 +211,16 @@ const StudentDashboard = () => {
           <CardHeader>
             <CardTitle className="text-lg flex items-center">
               <Award className="w-5 h-5 mr-2 text-yellow-600" />
-              Academic Profile
+              CBC Academic Profile
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">KCSE Grade:</span>
+              <span className="text-sm text-gray-600">Current Grade:</span>
+              <span className="font-medium text-purple-600">Grade 9 (JSS)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">KCSE Projection:</span>
               <span className="font-medium text-green-600">Grade {user.kcseGrade}</span>
             </div>
             <div className="flex justify-between">
@@ -170,11 +228,11 @@ const StudentDashboard = () => {
               <span className="font-medium text-sm">{user.school}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Cluster:</span>
+              <span className="text-sm text-gray-600">Current Cluster:</span>
               <span className="font-medium text-sm">{user.cluster}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Competency Score:</span>
+              <span className="text-sm text-gray-600">CBC Competency:</span>
               <span className="font-medium text-blue-600">{user.competencyScore}/100</span>
             </div>
           </CardContent>
