@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, AlertCircle, Calendar, FileText, Users, Phone, GraduationCap, MapPin, Target, TrendingUp } from "lucide-react";
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const PlacementTracking = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   // Dynamic applications based on user profile
   const generateUserApplications = () => {
@@ -17,7 +17,7 @@ const PlacementTracking = () => {
       {
         id: 1,
         institution: 'University of Nairobi',
-        program: user.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 'Bachelor of Arts',
+        program: user.profileData?.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 'Bachelor of Arts',
         code: 'J01/01/01',
         appliedDate: '2024-05-15',
         status: 'placed',
@@ -25,8 +25,8 @@ const PlacementTracking = () => {
         totalStages: 4,
         nextStep: 'Report for Admission',
         nextDate: '2024-08-15',
-        cutoffPoints: user.cluster === 'STEM' ? 75 : 65,
-        yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65,
+        cutoffPoints: user.profileData?.cluster === 'STEM' ? 75 : 65,
+        yourPoints: 70, // Default since we don't have KCSE grades in new system
         priority: 1,
         matchProbability: 92,
         timeline: [
@@ -39,17 +39,17 @@ const PlacementTracking = () => {
       },
       {
         id: 2,
-        institution: user.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
-        program: user.cluster === 'Technical' ? 'Diploma in Information Technology' : 'Bachelor of Science in Computer Science',
-        code: user.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
+        institution: user.profileData?.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
+        program: user.profileData?.cluster === 'Technical' ? 'Diploma in Information Technology' : 'Bachelor of Science in Computer Science',
+        code: user.profileData?.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
         appliedDate: '2024-05-15',
         status: 'revision',
         stage: 3,
         totalStages: 4,
         nextStep: 'KUCCPS Revision Round',
         nextDate: '2024-07-01',
-        cutoffPoints: user.cluster === 'Technical' ? 45 : 65,
-        yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 62,
+        cutoffPoints: user.profileData?.cluster === 'Technical' ? 45 : 65,
+        yourPoints: 62,
         priority: 2,
         matchProbability: 78,
         timeline: [
@@ -63,7 +63,6 @@ const PlacementTracking = () => {
 
     return baseApplications.map(app => ({
       ...app,
-      yourPoints: parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || app.yourPoints,
       predictedSuccess: app.yourPoints >= app.cutoffPoints ? 'High' : app.yourPoints >= app.cutoffPoints - 5 ? 'Medium' : 'Low'
     }));
   };
@@ -71,12 +70,12 @@ const PlacementTracking = () => {
   const kuccpsApplications = generateUserApplications();
 
   const helbStatus = {
-    applicationId: `HELB2024${user?.studentId?.slice(-3) || '001'}`,
-    status: user?.helbStatus || 'approved',
-    loanAmount: user?.cluster === 'STEM' ? 'KSh 185,000' : 'KSh 160,000',
+    applicationId: `HELB2024${user?.id?.slice(-3) || '001'}`,
+    status: 'approved',
+    loanAmount: user?.profileData?.cluster === 'STEM' ? 'KSh 185,000' : 'KSh 160,000',
     upkeepAmount: 'KSh 60,000',
     disbursementDate: '2024-08-01',
-    eligibilityScore: user?.competencyScore >= 80 ? 95 : user?.competencyScore >= 70 ? 85 : 75
+    eligibilityScore: 85
   };
 
   const getStatusColor = (status) => {
@@ -121,7 +120,7 @@ const PlacementTracking = () => {
           </h1>
           <p className="text-gray-600 mt-1">
             {user 
-              ? `Monitor your ${user.cluster} cluster applications and HELB status`
+              ? `Monitor your ${user.profileData?.cluster || 'current'} cluster applications and HELB status`
               : 'Monitor your university placement progress and HELB loan status'
             }
           </p>
@@ -129,9 +128,9 @@ const PlacementTracking = () => {
         {user && (
           <div className="text-right">
             <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-              {user.cluster} Cluster
+              {user.profileData?.cluster || 'General'} Cluster
             </Badge>
-            <div className="text-sm text-gray-600 mt-1">Competency Score: {user.competencyScore}</div>
+            <div className="text-sm text-gray-600 mt-1">Role: {user.role}</div>
           </div>
         )}
       </div>
@@ -206,9 +205,9 @@ const PlacementTracking = () => {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-purple-600">
-              {user ? user.kcseGrade : '78'}
+              {user ? 'Grade ' + (user.profileData?.grade || 9) : '78'}
             </div>
-            <div className="text-sm text-gray-600">Your KCSE Points</div>
+            <div className="text-sm text-gray-600">Current Grade</div>
           </CardContent>
         </Card>
       </div>

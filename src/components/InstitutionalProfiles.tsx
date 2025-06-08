@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Download, Database, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import CBALevelsCard from './institutions/CBALevelsCard';
 import AIRecommendationsPanel from './institutions/AIRecommendationsPanel';
 import InstitutionFilters from './institutions/InstitutionFilters';
@@ -35,7 +35,7 @@ interface EnhancedInstitution {
 }
 
 const InstitutionalProfiles = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
@@ -44,13 +44,11 @@ const InstitutionalProfiles = () => {
   const getRecommendedInstitutions = (): EnhancedInstitution[] => {
     if (!user) return kenyanInstitutions as EnhancedInstitution[];
     
-    // Filter institutions based on user's KCSE grade and cluster
+    // Filter institutions based on user's performance and cluster
     return kenyanInstitutions.filter(institution => {
-      const userGradePoints = parseFloat(user.kcseGrade.replace(/[^\d.]/g, '')) || 50;
+      // Since we don't have KCSE grades in the new auth system, use a default threshold
       const institutionRequirement = cbaLevels[institution.cbaRequirement];
-      
-      // Simple scoring based on competency and cluster alignment
-      return userGradePoints >= (institutionRequirement?.minPoints || 40);
+      return true; // Keep all institutions for now
     }).map(institution => ({
       ...institution,
       matchScore: calculateMatchScore(institution, user),
@@ -62,24 +60,23 @@ const InstitutionalProfiles = () => {
     let score = 70; // Base score
     
     // Boost score for cluster alignment
-    if (user.cluster === 'STEM' && institution.sector === 'Public University') score += 15;
-    if (user.cluster === 'Technical' && institution.sector.includes('TVET')) score += 20;
-    if (user.cluster === 'Business' && institution.name.toLowerCase().includes('business')) score += 10;
+    if (user.profileData?.cluster === 'STEM' && institution.sector === 'Public University') score += 15;
+    if (user.profileData?.cluster === 'Technical' && institution.sector.includes('TVET')) score += 20;
+    if (user.profileData?.cluster === 'Business' && institution.name.toLowerCase().includes('business')) score += 10;
     
-    // Boost for competency score alignment
-    if (user.competencyScore >= 85) score += 10;
-    if (user.competencyScore >= 90) score += 5;
+    // Boost for role alignment
+    if (user.role === 'student') score += 10;
     
     return Math.min(score, 98);
   };
 
   const getRecommendationReason = (institution: any, user: any): string => {
     const reasons = [];
-    if (user.cluster === 'STEM' && institution.sector === 'Public University') {
+    if (user.profileData?.cluster === 'STEM' && institution.sector === 'Public University') {
       reasons.push('Strong STEM programs');
     }
-    if (user.competencyScore >= 85) {
-      reasons.push('Matches your high competency level');
+    if (user.role === 'student') {
+      reasons.push('Matches your student profile');
     }
     if (institution.helbEligible) {
       reasons.push('HELB funding available');
@@ -176,7 +173,7 @@ Generated on: ${new Date().toLocaleDateString()}
           </h1>
           <p className="text-gray-600 mt-1">
             {user 
-              ? `Personalized recommendations based on your ${user.cluster} cluster and ${user.kcseGrade} performance`
+              ? `Personalized recommendations based on your ${user.profileData?.cluster || 'current'} cluster and profile`
               : 'Comprehensive database including Universities, Polytechnics, and TVET colleges'
             }
           </p>
