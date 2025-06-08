@@ -1,621 +1,660 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star, Target, Brain, DollarSign, Calendar, BookOpen, ArrowRight } from "lucide-react";
+import { 
+  Target, 
+  TrendingUp, 
+  Clock, 
+  Users, 
+  MapPin, 
+  Star, 
+  DollarSign, 
+  Calendar, 
+  GraduationCap,
+  AlertCircle,
+  CheckCircle,
+  BookOpen,
+  Building,
+  Award,
+  Calculator,
+  Info,
+  ArrowUpDown,
+  Filter
+} from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
+import FundingCalculator from './bidding/FundingCalculator';
+import FundingInfoPanel from './bidding/FundingInfoPanel';
 
 const Bidding = () => {
   const { user } = useAuth();
-  const [activeBids, setActiveBids] = useState([]);
-  const [selectedPriority, setSelectedPriority] = useState({});
-  const [transitionType, setTransitionType] = useState('jss-to-sss'); // Default transition
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [transitionType, setTransitionType] = useState<'JSS-SSS' | 'SSS-Tertiary'>('SSS-Tertiary');
+  const [selectedCluster, setSelectedCluster] = useState('all');
+  const [sortBy, setSortBy] = useState('relevance');
+  const [showOnlyAffordable, setShowOnlyAffordable] = useState(false);
 
   // Transition types
   const transitionTypes = [
-    { value: 'jss-to-sss', label: 'JSS to SSS (Grade 9 → Grade 10)', description: 'Junior Secondary to Senior Secondary School' },
-    { value: 'sss-to-tertiary', label: 'SSS to Tertiary (Grade 12 → University/TVET)', description: 'Senior Secondary to Tertiary Education' }
+    { value: 'JSS-SSS', label: 'JSS to SSS (Grade 9 → Grade 10)', description: 'Junior Secondary to Senior Secondary School' },
+    { value: 'SSS-Tertiary', label: 'SSS to Tertiary (Grade 12 → University/TVET)', description: 'Senior Secondary to Tertiary Education' }
   ];
 
   // Generate dynamic opportunities based on transition type and user profile
-  const generateUserOpportunities = () => {
-    if (!user) return [];
-
-    const userPoints = parseInt(user.profileData?.grade?.toString() || '65') || 65;
-    
-    if (transitionType === 'jss-to-sss') {
-      return [
-        {
-          id: 1,
-          institution: 'Nairobi High School',
-          program: 'STEM Pathway - Senior Secondary',
-          code: 'SSS-STEM-001',
-          type: 'Senior Secondary',
-          location: 'Nairobi',
-          cutoffPoints: { current: 75, minimum: 70, maximum: 85 },
-          deadline: '2024-06-15',
-          timeLeft: '3 days',
-          totalBidders: 840,
-          capacity: 120,
-          clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
-          description: 'Focus on Science, Technology, Engineering, and Mathematics for university preparation.',
-          status: 'active',
-          userBid: null,
-          helbEligible: false,
-          scholarships: ['Academic Excellence', 'STEM Scholarship'],
-          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'SSS'),
-          competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High',
-          fees: { tuition: 45000, boarding: 25000, other: 15000 },
-          duration: '3 years (Grade 10-12)',
-          currentBand: 'A',
-          nextReviewDate: '2024-07-01'
+  const generatePrograms = () => {
+    const basePrograms = [
+      // University Programs (SSS-Tertiary)
+      {
+        id: 1,
+        name: 'Bachelor of Medicine and Bachelor of Surgery',
+        institution: 'University of Nairobi',
+        code: 'J01/01/01',
+        points: 75,
+        cluster: 'STEM',
+        duration: '6 years',
+        annualFee: 185000,
+        totalCost: 1110000,
+        currentBand: 'A',
+        competitiveness: 95,
+        employability: 98,
+        marketDemand: 'Very High',
+        transitionType: 'SSS-Tertiary',
+        placementStats: {
+          applied: 12450,
+          placed: 285,
+          cutoffTrend: 'stable'
         },
-        {
-          id: 2,
-          institution: 'Kiambu Technical High School',
-          program: 'TVET Pathway - Technical Track',
-          code: 'SSS-TVET-002',
-          type: 'Senior Secondary',
-          location: 'Kiambu',
-          cutoffPoints: { current: 55, minimum: 50, maximum: 65 },
-          deadline: '2024-06-12',
-          timeLeft: '8 hours',
-          totalBidders: 560,
-          capacity: 80,
-          clusters: ['Mathematics', 'Physics', 'Technical Studies'],
-          description: 'Technical and Vocational pathway leading to practical skills and TVET colleges.',
-          status: 'urgent',
-          userBid: null,
-          helbEligible: false,
-          scholarships: ['Technical Skills Fund'],
-          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'SSS'),
-          competitiveness: userPoints >= 60 ? 'Low' : 'Medium',
-          fees: { tuition: 35000, boarding: 20000, other: 10000 },
-          duration: '3 years (Grade 10-12)',
-          currentBand: 'B',
-          nextReviewDate: '2024-07-15'
+        fundingOptions: {
+          helb: 60000,
+          scholarship: 90,
+          workStudy: true
+        },
+        careerOutlook: {
+          startingSalary: 120000,
+          growthRate: 15,
+          jobSecurity: 'Very High'
         }
-      ];
+      },
+      {
+        id: 2,
+        name: 'Bachelor of Engineering (Computer)',
+        institution: 'Jomo Kenyatta University',
+        code: 'J07/04/02',
+        points: 68,
+        cluster: 'STEM',
+        duration: '4 years',
+        annualFee: 165000,
+        totalCost: 660000,
+        currentBand: 'A-',
+        competitiveness: 82,
+        employability: 95,
+        marketDemand: 'Very High',
+        transitionType: 'SSS-Tertiary',
+        placementStats: {
+          applied: 8920,
+          placed: 520,
+          cutoffTrend: 'rising'
+        },
+        fundingOptions: {
+          helb: 60000,
+          scholarship: 75,
+          workStudy: true
+        },
+        careerOutlook: {
+          startingSalary: 85000,
+          growthRate: 25,
+          jobSecurity: 'Very High'
+        }
+      },
+      // Secondary Programs (JSS-SSS)
+      {
+        id: 3,
+        name: 'Science, Technology, Engineering & Mathematics (STEM)',
+        institution: 'Alliance High School',
+        code: 'SS/STEM/001',
+        points: 85,
+        cluster: 'STEM',
+        duration: '3 years',
+        annualFee: 45000,
+        totalCost: 135000,
+        currentBand: 'Level 4',
+        competitiveness: 88,
+        employability: 92,
+        marketDemand: 'High',
+        transitionType: 'JSS-SSS',
+        placementStats: {
+          applied: 3200,
+          placed: 180,
+          cutoffTrend: 'stable'
+        },
+        fundingOptions: {
+          fdse: 22244,
+          scholarship: 85,
+          workStudy: false
+        },
+        careerOutlook: {
+          universityReadiness: 95,
+          pathwayOptions: 15,
+          skillDevelopment: 'Excellent'
+        }
+      },
+      {
+        id: 4,
+        name: 'Arts & Social Sciences Pathway',
+        institution: 'Starehe Boys Centre',
+        code: 'SS/ARTS/002',
+        points: 78,
+        cluster: 'Arts',
+        duration: '3 years',
+        annualFee: 38000,
+        totalCost: 114000,
+        currentBand: 'Level 4',
+        competitiveness: 75,
+        employability: 85,
+        marketDemand: 'Moderate',
+        transitionType: 'JSS-SSS',
+        placementStats: {
+          applied: 2800,
+          placed: 280,
+          cutoffTrend: 'stable'
+        },
+        fundingOptions: {
+          fdse: 22244,
+          scholarship: 70,
+          workStudy: false
+        },
+        careerOutlook: {
+          universityReadiness: 88,
+          pathwayOptions: 12,
+          skillDevelopment: 'Very Good'
+        }
+      },
+      // TVET Programs
+      {
+        id: 5,
+        name: 'Diploma in Information Communication Technology',
+        institution: 'Kenya Institute of Management',
+        code: 'T07/04/01',
+        points: 45,
+        cluster: 'Technical',
+        duration: '3 years',
+        annualFee: 85000,
+        totalCost: 255000,
+        currentBand: 'Credit',
+        competitiveness: 60,
+        employability: 88,
+        marketDemand: 'High',
+        transitionType: 'SSS-Tertiary',
+        placementStats: {
+          applied: 2200,
+          placed: 450,
+          cutoffTrend: 'stable'
+        },
+        fundingOptions: {
+          helb: 50000,
+          tvetCapitation: 30000,
+          scholarship: 60,
+          workStudy: true
+        },
+        careerOutlook: {
+          startingSalary: 45000,
+          growthRate: 18,
+          jobSecurity: 'High'
+        }
+      }
+    ];
+
+    // Filter by transition type and cluster
+    return basePrograms.filter(program => {
+      const matchesTransition = program.transitionType === transitionType;
+      const matchesCluster = selectedCluster === 'all' || program.cluster === selectedCluster;
+      return matchesTransition && matchesCluster;
+    });
+  };
+
+  const programs = generatePrograms();
+
+  const getAffordabilityStatus = (program) => {
+    const maxAffordable = 100000; // Example threshold
+    if (program.annualFee <= maxAffordable) return { status: 'affordable', color: 'text-green-600' };
+    if (program.fundingOptions.scholarship >= 70) return { status: 'with aid', color: 'text-yellow-600' };
+    return { status: 'challenging', color: 'text-red-600' };
+  };
+
+  const getCompetitivenessColor = (score) => {
+    if (score >= 80) return 'text-red-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-green-600';
+  };
+
+  const getBandColor = (band, transitionType) => {
+    if (transitionType === 'JSS-SSS') {
+      // CBC Proficiency Levels
+      if (band.includes('Level 4')) return 'bg-green-100 text-green-800';
+      if (band.includes('Level 3')) return 'bg-blue-100 text-blue-800';
+      return 'bg-gray-100 text-gray-800';
     } else {
-      return [
-        {
-          id: 3,
-          institution: 'University of Nairobi',
-          program: 'Bachelor of Medicine and Bachelor of Surgery',
-          code: 'J01/01/01',
-          type: 'Degree',
-          location: 'Nairobi',
-          cutoffPoints: { current: 75, minimum: 70, maximum: 84 },
-          deadline: '2024-06-15',
-          timeLeft: '3 days',
-          totalBidders: 2840,
-          capacity: 150,
-          clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
-          description: 'Premier medical program with excellent career prospects.',
-          status: 'active',
-          userBid: null,
-          helbEligible: true,
-          scholarships: ['Merit-based', 'Need-based'],
-          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'University'),
-          competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High',
-          fees: { tuition: 120000, boarding: 45000, other: 25000 },
-          duration: '6 years',
-          currentBand: 'A+',
-          nextReviewDate: '2024-08-01'
-        },
-        {
-          id: 4,
-          institution: 'Kiambu Institute of Science and Technology',
-          program: 'Diploma in Information Technology',
-          code: 'T07/04/01',
-          type: 'Diploma',
-          location: 'Kiambu',
-          cutoffPoints: { current: 45, minimum: 40, maximum: 55 },
-          deadline: '2024-06-12',
-          timeLeft: '8 hours',
-          totalBidders: 1560,
-          capacity: 120,
-          clusters: ['Mathematics', 'Physics', 'Computer Studies'],
-          description: 'Technology-focused program with industry partnerships and internships.',
-          status: 'urgent',
-          userBid: null,
-          helbEligible: true,
-          scholarships: ['Tech Innovation Fund'],
-          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'TVET'),
-          competitiveness: userPoints >= 50 ? 'Low' : 'Medium',
-          fees: { tuition: 85000, boarding: 35000, other: 15000 },
-          duration: '3 years',
-          currentBand: 'B+',
-          nextReviewDate: '2024-07-20'
-        }
-      ];
+      // University grades
+      if (band.includes('A')) return 'bg-green-100 text-green-800';
+      if (band.includes('B')) return 'bg-blue-100 text-blue-800';
+      return 'bg-yellow-100 text-yellow-800';
     }
   };
 
-  const calculateMatchScore = (userPoints, cluster, institutionType) => {
-    let score = 60;
-    
-    // Points alignment
-    if (userPoints >= 75) score += 20;
-    else if (userPoints >= 65) score += 15;
-    else if (userPoints >= 55) score += 10;
-    
-    // Cluster alignment
-    if (cluster === 'STEM' && institutionType === 'University') score += 15;
-    if (cluster === 'Technical' && institutionType === 'TVET') score += 20;
-    if (cluster === 'Business' && institutionType === 'University') score += 10;
-    
-    return Math.min(score, 98);
+  const getProgramType = (transitionType) => {
+    return transitionType === 'JSS-SSS' ? 'secondary' : 'university';
   };
-
-  const kuccpsOpportunities = generateUserOpportunities();
-
-  const placeBid = (opportunityId, priority) => {
-    setSelectedPriority(prev => ({ ...prev, [opportunityId]: priority }));
-    setActiveBids(prev => [...prev, { opportunityId, priority, timestamp: new Date() }]);
-    console.log(`Priority ${priority} set for program ${opportunityId}`);
-  };
-
-  const getBidProgress = (current, min, max) => {
-    return ((current - min) / (max - min)) * 100;
-  };
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-300';
-      case 'active': return 'bg-blue-100 text-blue-800 border-blue-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
-    }
-  };
-
-  const getCompetitivenessColor = (competitiveness) => {
-    switch(competitiveness) {
-      case 'Low': return 'text-green-600';
-      case 'Medium': return 'text-yellow-600';
-      case 'High': return 'text-red-600';
-      default: return 'text-gray-600';
-    }
-  };
-
-  const getBandColor = (band) => {
-    switch(band) {
-      case 'A+': return 'bg-green-600 text-white';
-      case 'A': return 'bg-green-500 text-white';
-      case 'B+': return 'bg-blue-500 text-white';
-      case 'B': return 'bg-blue-400 text-white';
-      case 'C': return 'bg-yellow-500 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
-
-  const userPoints = user ? parseInt(user.profileData?.grade?.toString() || '65') || 65 : 65;
-  const matchProbability = kuccpsOpportunities.length > 0 
-    ? Math.round(kuccpsOpportunities.reduce((acc, opp) => acc + opp.matchScore, 0) / kuccpsOpportunities.length)
-    : 78;
-
-  const currentTransition = transitionTypes.find(t => t.value === transitionType);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {user ? `Enhanced KUCCPS Selection for ${user.name}` : 'Enhanced KUCCPS Program Selection'}
+            Educational Pathway Bidding
           </h1>
           <p className="text-gray-600 mt-1">
-            Choose your transition pathway and explore programs with detailed costs, duration, and current performance bands
+            Choose your educational journey with comprehensive funding information
           </p>
         </div>
         {user && (
-          <div className="text-right">
-            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-              <Brain className="w-4 h-4 mr-1" />
-              AI Optimized
-            </Badge>
-            <div className="text-sm text-gray-600 mt-1">Role: {user.role}</div>
-          </div>
+          <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            {user.name} - {user.profileData?.cluster || 'General'} Track
+          </Badge>
         )}
       </div>
 
-      {/* Transition Type Selection */}
-      <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+      {/* Transition Type Selector */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
         <CardHeader>
-          <CardTitle className="flex items-center text-green-900">
-            <ArrowRight className="w-5 h-5 mr-2" />
-            Select Your Transition Pathway
+          <CardTitle className="flex items-center">
+            <ArrowUpDown className="w-5 h-5 mr-2 text-purple-600" />
+            Choose Your Transition Path
           </CardTitle>
-          <CardDescription>Choose the educational transition that applies to your current situation</CardDescription>
         </CardHeader>
         <CardContent>
-          <Select value={transitionType} onValueChange={setTransitionType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select transition type" />
-            </SelectTrigger>
-            <SelectContent>
-              {transitionTypes.map((transition) => (
-                <SelectItem key={transition.value} value={transition.value}>
-                  <div>
-                    <div className="font-medium">{transition.label}</div>
-                    <div className="text-sm text-gray-600">{transition.description}</div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {currentTransition && (
-            <div className="mt-3 p-3 bg-white rounded-lg border">
-              <div className="font-medium text-blue-900">{currentTransition.label}</div>
-              <div className="text-sm text-gray-600">{currentTransition.description}</div>
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button
+              variant={transitionType === 'JSS-SSS' ? 'default' : 'outline'}
+              onClick={() => setTransitionType('JSS-SSS')}
+              className="h-20 flex flex-col items-center justify-center"
+            >
+              <GraduationCap className="w-6 h-6 mb-2" />
+              <div>JSS → Senior Secondary</div>
+              <div className="text-xs opacity-75">Grade 9 to Grade 10+</div>
+            </Button>
+            <Button
+              variant={transitionType === 'SSS-Tertiary' ? 'default' : 'outline'}
+              onClick={() => setTransitionType('SSS-Tertiary')}
+              className="h-20 flex flex-col items-center justify-center"
+            >
+              <Building className="w-6 h-6 mb-2" />
+              <div>SSS → Tertiary Education</div>
+              <div className="text-xs opacity-75">University, College, TVET</div>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      {/* AI Recommendations Panel */}
-      {user && (
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-          <CardHeader>
-            <CardTitle className="flex items-center text-indigo-900">
-              <Target className="w-5 h-5 mr-2" />
-              AI Selection Optimization
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-indigo-600">{matchProbability}%</div>
-                <div className="text-sm text-gray-600">Overall Match Rate</div>
-                <div className="text-xs text-indigo-600 mt-1">AI Calculated</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-green-600">
-                  {kuccpsOpportunities.filter(opp => opp.matchScore >= 80).length}
-                </div>
-                <div className="text-sm text-gray-600">High Match Programs</div>
-                <div className="text-xs text-green-600 mt-1">80%+ compatibility</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{user.profileData?.cluster || 'General'}</div>
-                <div className="text-sm text-gray-600">Your Cluster</div>
-                <div className="text-xs text-blue-600 mt-1">Optimized Selection</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">
-                  {kuccpsOpportunities.filter(opp => opp.competitiveness === 'Low').length}
-                </div>
-                <div className="text-sm text-gray-600">Safe Choices</div>
-                <div className="text-xs text-purple-600 mt-1">Low Competition</div>
-              </div>
+      {/* Enhanced Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Cluster/Field</label>
+              <Select value={selectedCluster} onValueChange={setSelectedCluster}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All clusters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Clusters</SelectItem>
+                  <SelectItem value="STEM">STEM</SelectItem>
+                  <SelectItem value="Arts">Arts & Social Sciences</SelectItem>
+                  <SelectItem value="Technical">Technical & Vocational</SelectItem>
+                  <SelectItem value="Sports">Sports & Performing Arts</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Sort By</label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                  <SelectItem value="cost-low">Cost (Low to High)</SelectItem>
+                  <SelectItem value="cost-high">Cost (High to Low)</SelectItem>
+                  <SelectItem value="competitiveness">Competitiveness</SelectItem>
+                  <SelectItem value="employability">Employability</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant={showOnlyAffordable ? 'default' : 'outline'}
+                onClick={() => setShowOnlyAffordable(!showOnlyAffordable)}
+                className="w-full"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Affordable Only
+              </Button>
+            </div>
+            <div className="flex items-end">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <Info className="w-4 h-4 mr-2" />
+                    Funding Guide
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Complete Funding Guide</DialogTitle>
+                    <DialogDescription>
+                      Learn about all available funding options for your education
+                    </DialogDescription>
+                  </DialogHeader>
+                  <FundingInfoPanel />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Programs Grid */}
+      <div className="grid gap-6">
+        {programs.map((program) => {
+          const affordability = getAffordabilityStatus(program);
+          const programType = getProgramType(program.transitionType);
+          
+          if (showOnlyAffordable && affordability.status === 'challenging') return null;
+          
+          return (
+            <Card key={program.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CardTitle className="text-lg">{program.name}</CardTitle>
+                      <Badge className={getBandColor(program.currentBand, program.transitionType)}>
+                        {program.currentBand}
+                      </Badge>
+                      <Badge variant="outline">{program.cluster}</Badge>
+                    </div>
+                    <CardDescription className="flex items-center space-x-4">
+                      <span className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {program.institution}
+                      </span>
+                      <span className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {program.duration}
+                      </span>
+                      <span className="flex items-center">
+                        <BookOpen className="w-4 h-4 mr-1" />
+                        {program.code}
+                      </span>
+                    </CardDescription>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {program.points} {transitionType === 'JSS-SSS' ? 'CBE Points' : 'KCSE Points'}
+                    </div>
+                    <div className="text-sm text-gray-600">Required</div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                {/* Cost and Funding Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-red-600">
+                      KES {program.annualFee.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Annual Fee</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-600">
+                      KES {program.totalCost.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Total Cost</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-lg font-bold ${affordability.color}`}>
+                      {affordability.status}
+                    </div>
+                    <div className="text-sm text-gray-600">Affordability</div>
+                  </div>
+                </div>
+
+                {/* Key Metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className={`text-xl font-bold ${getCompetitivenessColor(program.competitiveness)}`}>
+                      {program.competitiveness}%
+                    </div>
+                    <div className="text-xs text-gray-600">Competitiveness</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-xl font-bold text-green-600">
+                      {program.employability}%
+                    </div>
+                    <div className="text-xs text-gray-600">Employability</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-xl font-bold text-purple-600">
+                      {program.placementStats.placed}
+                    </div>
+                    <div className="text-xs text-gray-600">Placed</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-xl font-bold text-orange-600">
+                      {program.marketDemand}
+                    </div>
+                    <div className="text-xs text-gray-600">Market Demand</div>
+                  </div>
+                </div>
+
+                {/* Placement Statistics */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Placement Rate</span>
+                    <span>{Math.round((program.placementStats.placed / program.placementStats.applied) * 100)}%</span>
+                  </div>
+                  <Progress 
+                    value={(program.placementStats.placed / program.placementStats.applied) * 100} 
+                    className="h-2"
+                  />
+                  <div className="text-xs text-gray-600">
+                    {program.placementStats.placed} placed out of {program.placementStats.applied} applications
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3">
+                  <Button 
+                    onClick={() => setSelectedProgram(program)}
+                    className="flex-1 min-w-[150px]"
+                  >
+                    <Target className="w-4 h-4 mr-2" />
+                    Apply Now
+                  </Button>
+                  
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="flex-1 min-w-[150px]">
+                        <Calculator className="w-4 h-4 mr-2" />
+                        Funding Calculator
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>{program.name} - Funding Calculator</DialogTitle>
+                        <DialogDescription>
+                          Calculate your funding options and financial planning
+                        </DialogDescription>
+                      </DialogHeader>
+                      <FundingCalculator 
+                        programCost={program.totalCost}
+                        programType={programType as 'university' | 'tvet' | 'secondary'}
+                        transitionType={program.transitionType}
+                      />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">
+                        <Info className="w-4 h-4 mr-2" />
+                        Details
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>{program.name}</DialogTitle>
+                        <DialogDescription>{program.institution}</DialogDescription>
+                      </DialogHeader>
+                      <Tabs defaultValue="overview" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="overview">Overview</TabsTrigger>
+                          <TabsTrigger value="funding">Funding</TabsTrigger>
+                          <TabsTrigger value="career">Career Outlook</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="overview" className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium mb-2">Program Details</h4>
+                              <div className="space-y-1 text-sm">
+                                <div>Duration: {program.duration}</div>
+                                <div>Code: {program.code}</div>
+                                <div>Cluster: {program.cluster}</div>
+                                <div>Current Band: {program.currentBand}</div>
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-medium mb-2">Requirements</h4>
+                              <div className="space-y-1 text-sm">
+                                <div>Points: {program.points}</div>
+                                <div>Market Demand: {program.marketDemand}</div>
+                                <div>Employability: {program.employability}%</div>
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="funding" className="space-y-4">
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-2">Cost Breakdown</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span>Annual Fee:</span>
+                                  <span>KES {program.annualFee.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between font-bold">
+                                  <span>Total Program Cost:</span>
+                                  <span>KES {program.totalCost.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-medium mb-2">Available Funding</h4>
+                              <div className="space-y-2">
+                                {program.fundingOptions.helb && (
+                                  <div className="flex justify-between">
+                                    <span>HELB Loan:</span>
+                                    <span>KES {program.fundingOptions.helb.toLocaleString()}/year</span>
+                                  </div>
+                                )}
+                                {program.fundingOptions.fdse && (
+                                  <div className="flex justify-between">
+                                    <span>FDSE Support:</span>
+                                    <span>KES {program.fundingOptions.fdse.toLocaleString()}/year</span>
+                                  </div>
+                                )}
+                                {program.fundingOptions.tvetCapitation && (
+                                  <div className="flex justify-between">
+                                    <span>TVET Capitation:</span>
+                                    <span>KES {program.fundingOptions.tvetCapitation.toLocaleString()}/year</span>
+                                  </div>
+                                )}
+                                <div className="flex justify-between">
+                                  <span>Scholarship (Up to):</span>
+                                  <span>{program.fundingOptions.scholarship}% of costs</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="career" className="space-y-4">
+                          {program.careerOutlook.startingSalary ? (
+                            <div>
+                              <h4 className="font-medium mb-2">Career Prospects</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span>Starting Salary:</span>
+                                  <span>KES {program.careerOutlook.startingSalary.toLocaleString()}/month</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Growth Rate:</span>
+                                  <span>{program.careerOutlook.growthRate}% annually</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Job Security:</span>
+                                  <span>{program.careerOutlook.jobSecurity}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <h4 className="font-medium mb-2">Pathway Preparation</h4>
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span>University Readiness:</span>
+                                  <span>{program.careerOutlook.universityReadiness}%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Career Pathway Options:</span>
+                                  <span>{program.careerOutlook.pathwayOptions}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Skill Development:</span>
+                                  <span>{program.careerOutlook.skillDevelopment}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </TabsContent>
+                      </Tabs>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {programs.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Programs Found</h3>
+            <p className="text-gray-600">
+              Try adjusting your filters to see more programs for your selected transition path.
+            </p>
           </CardContent>
         </Card>
       )}
-
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">6</div>
-            <div className="text-sm text-gray-600">Available Slots</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {Object.keys(selectedPriority).length}
-            </div>
-            <div className="text-sm text-gray-600">Programs Selected</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-orange-600">
-              {user ? `Grade ${user.profileData?.grade || 9}` : 'B (65)'}
-            </div>
-            <div className="text-sm text-gray-600">Your Current Grade</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{matchProbability}%</div>
-            <div className="text-sm text-gray-600">Match Probability</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enhanced Instructions */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="p-4">
-          <div className="flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-            <div className="space-y-1">
-              <div className="font-medium text-blue-900">Enhanced KUCCPS Selection Guidelines</div>
-              <div className="text-sm text-blue-700">
-                {user 
-                  ? `For your ${currentTransition?.label} transition, we've curated programs with detailed cost breakdowns, course duration, and current performance bands. Consider your academic performance, financial capacity, and career goals.`
-                  : `Select programs based on your transition type. Review program costs, duration, and current performance bands to make informed decisions.`
-                }
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Available Programs */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">
-            {user ? 'AI-Recommended Programs' : 'Available Programs'}
-          </h2>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Current Transition:</span>
-            <Badge className="bg-green-100 text-green-800">{currentTransition?.label}</Badge>
-          </div>
-        </div>
-        
-        {kuccpsOpportunities
-          .sort((a, b) => b.matchScore - a.matchScore)
-          .map((program) => (
-          <Card key={program.id} className="hover:shadow-lg transition-shadow relative">
-            {program.matchScore >= 85 && (
-              <div className="absolute top-2 right-2">
-                <Badge className="bg-green-600 text-white">
-                  <Star className="w-3 h-3 mr-1" />
-                  Top Match
-                </Badge>
-              </div>
-            )}
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <CardTitle className="text-lg">{program.program}</CardTitle>
-                    <Badge className={getStatusColor(program.status)}>
-                      {program.status === 'urgent' ? 'Deadline Soon' : 'Active'}
-                    </Badge>
-                    {program.helbEligible && (
-                      <Badge className="bg-green-100 text-green-800 border-green-300">
-                        HELB Eligible
-                      </Badge>
-                    )}
-                    <Badge className={`${getBandColor(program.currentBand)}`}>
-                      Band {program.currentBand}
-                    </Badge>
-                  </div>
-                  <CardDescription className="mt-1">
-                    {program.institution} • {program.location} • Code: {program.code}
-                  </CardDescription>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">AI Match Score</div>
-                  <div className="font-bold text-purple-600">
-                    {program.matchScore}%
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    Cut-off: {program.cutoffPoints.current} pts
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-gray-600 text-sm">{program.description}</p>
-              
-              {/* Enhanced Program Details with Tabs */}
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="costs">Costs</TabsTrigger>
-                  <TabsTrigger value="duration">Duration</TabsTrigger>
-                  <TabsTrigger value="performance">Performance</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="overview" className="space-y-3">
-                  <div>
-                    <div className="text-sm font-medium mb-2">Required Subject Clusters:</div>
-                    <div className="flex flex-wrap gap-1">
-                      {program.clusters.map((cluster, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {cluster}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {program.scholarships.length > 0 && (
-                    <div>
-                      <div className="text-sm font-medium mb-2">Available Scholarships:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {program.scholarships.map((scholarship, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            <Star className="w-3 h-3 mr-1" />
-                            {scholarship}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="costs" className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="text-center p-3 bg-white rounded">
-                        <DollarSign className="w-5 h-5 mx-auto text-blue-600 mb-1" />
-                        <div className="font-bold text-blue-600">{formatCurrency(program.fees.tuition)}</div>
-                        <div className="text-xs text-gray-600">Annual Tuition</div>
-                      </div>
-                      <div className="text-center p-3 bg-white rounded">
-                        <DollarSign className="w-5 h-5 mx-auto text-green-600 mb-1" />
-                        <div className="font-bold text-green-600">{formatCurrency(program.fees.boarding)}</div>
-                        <div className="text-xs text-gray-600">Boarding (Annual)</div>
-                      </div>
-                      <div className="text-center p-3 bg-white rounded">
-                        <DollarSign className="w-5 h-5 mx-auto text-orange-600 mb-1" />
-                        <div className="font-bold text-orange-600">{formatCurrency(program.fees.other)}</div>
-                        <div className="text-xs text-gray-600">Other Fees</div>
-                      </div>
-                    </div>
-                    <div className="mt-3 p-3 bg-blue-50 rounded text-center">
-                      <div className="font-bold text-lg text-blue-800">
-                        {formatCurrency(program.fees.tuition + program.fees.boarding + program.fees.other)}
-                      </div>
-                      <div className="text-sm text-blue-600">Total Annual Cost</div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="duration" className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center justify-center mb-3">
-                      <Calendar className="w-8 h-8 text-purple-600" />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-bold text-xl text-purple-600">{program.duration}</div>
-                      <div className="text-sm text-gray-600 mt-1">Program Duration</div>
-                    </div>
-                    <div className="mt-4 text-sm text-gray-600">
-                      <div className="font-medium mb-2">What to expect:</div>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>Structured academic progression</li>
-                        <li>Competency-based assessments</li>
-                        <li>Career guidance and counseling</li>
-                        <li>Industry exposure and internships</li>
-                      </ul>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="performance" className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="text-center p-3 bg-white rounded">
-                        <Badge className={`${getBandColor(program.currentBand)} mb-2`}>
-                          Band {program.currentBand}
-                        </Badge>
-                        <div className="text-xs text-gray-600">Current Performance Band</div>
-                      </div>
-                      <div className="text-center p-3 bg-white rounded">
-                        <div className="font-bold text-gray-800">{program.nextReviewDate}</div>
-                        <div className="text-xs text-gray-600">Next Review Date</div>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      <div className="font-medium mb-2">Performance Indicators:</div>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>Graduate employment rate: 92%</li>
-                        <li>Industry satisfaction: High</li>
-                        <li>Student satisfaction: 4.2/5</li>
-                        <li>Research output: Above average</li>
-                      </ul>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-
-              {/* Cut-off Information */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Current Cut-off Points:</span>
-                  <span className="font-bold text-green-600">
-                    {program.cutoffPoints.current} points
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Cut-off Range</span>
-                    <span>{Math.round(getBidProgress(program.cutoffPoints.current, program.cutoffPoints.minimum, program.cutoffPoints.maximum))}%</span>
-                  </div>
-                  <Progress 
-                    value={getBidProgress(program.cutoffPoints.current, program.cutoffPoints.minimum, program.cutoffPoints.maximum)} 
-                    className="h-2"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>{program.cutoffPoints.minimum} pts (Min)</span>
-                    <span>{program.cutoffPoints.maximum} pts (Historical Max)</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 text-gray-400 mr-2" />
-                    {program.timeLeft}
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 text-gray-400 mr-2" />
-                    {program.totalBidders} applicants
-                  </div>
-                  <div className="flex items-center">
-                    <GraduationCap className="w-4 h-4 text-gray-400 mr-2" />
-                    {program.capacity} slots
-                  </div>
-                </div>
-              </div>
-
-              {/* User's Selection */}
-              {selectedPriority[program.id] && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-blue-900">Your Priority:</span>
-                    <span className="font-bold text-blue-600">
-                      Choice #{selectedPriority[program.id]}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Selection Actions */}
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="text-sm text-gray-600">
-                  <Badge className={`${getCompetitivenessColor(program.competitiveness)} mr-2`}>
-                    {program.competitiveness} Competition
-                  </Badge>
-                  <span>Capacity: {program.capacity} students</span>
-                </div>
-                <div className="space-x-2">
-                  <Button variant="outline" size="sm">
-                    <BookOpen className="w-4 h-4 mr-1" />
-                    View Details
-                  </Button>
-                  <select 
-                    className="px-3 py-1 border rounded text-sm mr-2"
-                    onChange={(e) => placeBid(program.id, e.target.value)}
-                    value={selectedPriority[program.id] || ''}
-                  >
-                    <option value="">Select Priority</option>
-                    <option value="1">1st Choice</option>
-                    <option value="2">2nd Choice</option>
-                    <option value="3">3rd Choice</option>
-                    <option value="4">4th Choice</option>
-                    <option value="5">5th Choice</option>
-                    <option value="6">6th Choice</option>
-                  </select>
-                  <Button 
-                    size="sm" 
-                    className="bg-gradient-to-r from-green-600 to-blue-600"
-                    disabled={!selectedPriority[program.id]}
-                  >
-                    Add to List
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
     </div>
   );
 };
