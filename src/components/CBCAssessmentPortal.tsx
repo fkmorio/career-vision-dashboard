@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,11 +19,11 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useCBC } from '../contexts/CBCContext';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const CBCAssessmentPortal = () => {
   const { competencies, assessments, addAssessment, updateCompetency } = useCBC();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState('');
   const [assessmentType, setAssessmentType] = useState<'CBA' | 'SBA'>('CBA');
   const [feedback, setFeedback] = useState('');
@@ -60,7 +59,7 @@ const CBCAssessmentPortal = () => {
     addAssessment({
       type: assessmentType,
       subject: selectedSubject,
-      grade: user?.kcseGrade ? parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 8 : 8,
+      grade: user?.profileData?.grade || 8,
       competencyLevel: 3, // Default to proficient
       feedback,
       portfolio: []
