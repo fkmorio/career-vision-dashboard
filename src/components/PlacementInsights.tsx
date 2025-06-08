@@ -10,7 +10,7 @@ const PlacementInsights = () => {
 
   // Dynamic data based on user profile
   const getUserSpecificData = () => {
-    if (!user) return { cluster: 'General', accuracy: 75, matchRate: 68 };
+    if (!user) return { cluster: 'General', accuracy: 75, matchRate: 68, trend: '+5%' };
     
     const clusterMap = {
       'STEM': { accuracy: 92, matchRate: 88, trend: '+12%' },
