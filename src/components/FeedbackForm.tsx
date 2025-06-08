@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageSquare, Send, Tag } from "lucide-react";
 import { useFeedback, Feedback } from '../contexts/FeedbackContext';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const FeedbackForm = () => {
   const { submitFeedback } = useFeedback();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     category: '',
     priority: '',
@@ -35,7 +35,7 @@ const FeedbackForm = () => {
     }
 
     const feedbackData = {
-      userId: user?.studentId || 'anonymous',
+      userId: user?.profileData?.studentId || user?.id || 'anonymous',
       userName: user?.name || 'Anonymous User',
       category: formData.category as Feedback['category'],
       priority: formData.priority as Feedback['priority'],
