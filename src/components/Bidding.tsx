@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,10 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star, Target, Brain } from "lucide-react";
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Bidding = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [activeBids, setActiveBids] = useState([]);
   const [selectedPriority, setSelectedPriority] = useState({});
 
@@ -16,63 +17,63 @@ const Bidding = () => {
   const generateUserOpportunities = () => {
     if (!user) return [];
 
-    const userPoints = parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65;
+    const userPoints = parseInt(user.profileData?.grade?.toString() || '65') || 65;
     
     const baseOpportunities = [
       {
         id: 1,
         institution: 'University of Nairobi',
-        program: user.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 
-                 user.cluster === 'Business' ? 'Bachelor of Commerce' : 'Bachelor of Arts',
+        program: user.profileData?.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 
+                 user.profileData?.cluster === 'Business' ? 'Bachelor of Commerce' : 'Bachelor of Arts',
         code: 'J01/01/01',
         type: 'Degree',
         location: 'Nairobi',
         cutoffPoints: { 
-          current: user.cluster === 'STEM' ? 75 : user.cluster === 'Business' ? 68 : 62, 
-          minimum: user.cluster === 'STEM' ? 70 : user.cluster === 'Business' ? 62 : 55, 
-          maximum: user.cluster === 'STEM' ? 84 : user.cluster === 'Business' ? 75 : 68 
+          current: user.profileData?.cluster === 'STEM' ? 75 : user.profileData?.cluster === 'Business' ? 68 : 62, 
+          minimum: user.profileData?.cluster === 'STEM' ? 70 : user.profileData?.cluster === 'Business' ? 62 : 55, 
+          maximum: user.profileData?.cluster === 'STEM' ? 84 : user.profileData?.cluster === 'Business' ? 75 : 68 
         },
         deadline: '2024-06-15',
         timeLeft: '3 days',
-        totalBidders: user.cluster === 'STEM' ? 2840 : 1840,
-        capacity: user.cluster === 'STEM' ? 150 : 200,
-        clusters: user.cluster === 'STEM' ? ['Mathematics', 'Physics', 'Chemistry', 'Biology'] :
-                  user.cluster === 'Business' ? ['Mathematics', 'Business Studies', 'Economics'] :
+        totalBidders: user.profileData?.cluster === 'STEM' ? 2840 : 1840,
+        capacity: user.profileData?.cluster === 'STEM' ? 150 : 200,
+        clusters: user.profileData?.cluster === 'STEM' ? ['Mathematics', 'Physics', 'Chemistry', 'Biology'] :
+                  user.profileData?.cluster === 'Business' ? ['Mathematics', 'Business Studies', 'Economics'] :
                   ['English', 'Literature', 'History', 'Geography'],
-        description: `Premier ${user.cluster.toLowerCase()} program with excellent career prospects.`,
+        description: `Premier ${user.profileData?.cluster?.toLowerCase() || 'academic'} program with excellent career prospects.`,
         status: 'active',
         userBid: null,
         helbEligible: true,
         scholarships: ['Merit-based', 'Need-based'],
-        matchScore: calculateMatchScore(userPoints, user.cluster, 'University'),
+        matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'University'),
         competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High'
       },
       {
         id: 2,
-        institution: user.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
-        program: user.cluster === 'Technical' ? 'Diploma in Information Technology' : 
+        institution: user.profileData?.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
+        program: user.profileData?.cluster === 'Technical' ? 'Diploma in Information Technology' : 
                  'Bachelor of Science in Computer Science',
-        code: user.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
-        type: user.cluster === 'Technical' ? 'Diploma' : 'Degree',
+        code: user.profileData?.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
+        type: user.profileData?.cluster === 'Technical' ? 'Diploma' : 'Degree',
         location: 'Kiambu',
         cutoffPoints: { 
-          current: user.cluster === 'Technical' ? 45 : 65, 
-          minimum: user.cluster === 'Technical' ? 40 : 58, 
-          maximum: user.cluster === 'Technical' ? 55 : 72 
+          current: user.profileData?.cluster === 'Technical' ? 45 : 65, 
+          minimum: user.profileData?.cluster === 'Technical' ? 40 : 58, 
+          maximum: user.profileData?.cluster === 'Technical' ? 55 : 72 
         },
         deadline: '2024-06-12',
         timeLeft: '8 hours',
         totalBidders: 1560,
         capacity: 120,
-        clusters: user.cluster === 'Technical' ? ['Mathematics', 'Physics', 'Computer Studies'] :
+        clusters: user.profileData?.cluster === 'Technical' ? ['Mathematics', 'Physics', 'Computer Studies'] :
                   ['Mathematics', 'Physics', 'Computer Studies'],
         description: 'Technology-focused program with industry partnerships and internships.',
         status: 'urgent',
         userBid: null,
         helbEligible: true,
         scholarships: ['Tech Innovation Fund'],
-        matchScore: calculateMatchScore(userPoints, user.cluster, user.cluster === 'Technical' ? 'TVET' : 'University'),
-        competitiveness: userPoints >= (user.cluster === 'Technical' ? 50 : 70) ? 'Low' : 'Medium'
+        matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', user.profileData?.cluster === 'Technical' ? 'TVET' : 'University'),
+        competitiveness: userPoints >= (user.profileData?.cluster === 'Technical' ? 50 : 70) ? 'Low' : 'Medium'
       }
     ];
 
@@ -126,7 +127,7 @@ const Bidding = () => {
     }
   };
 
-  const userPoints = user ? parseInt(user.kcseGrade.replace(/[^\d]/g, '')) || 65 : 65;
+  const userPoints = user ? parseInt(user.profileData?.grade?.toString() || '65') || 65 : 65;
   const matchProbability = kuccpsOpportunities.length > 0 
     ? Math.round(kuccpsOpportunities.reduce((acc, opp) => acc + opp.matchScore, 0) / kuccpsOpportunities.length)
     : 78;
@@ -140,7 +141,7 @@ const Bidding = () => {
           </h1>
           <p className="text-gray-600 mt-1">
             {user 
-              ? `AI-curated programs for your ${user.cluster} cluster and ${user.kcseGrade} performance`
+              ? `AI-curated programs for your ${user.profileData?.cluster || 'current'} cluster and Grade ${user.profileData?.grade || 'current'} performance`
               : 'Select and prioritize your preferred university programs through KUCCPS'
             }
           </p>
@@ -151,7 +152,7 @@ const Bidding = () => {
               <Brain className="w-4 h-4 mr-1" />
               AI Optimized
             </Badge>
-            <div className="text-sm text-gray-600 mt-1">Competency: {user.competencyScore}</div>
+            <div className="text-sm text-gray-600 mt-1">Role: {user.role}</div>
           </div>
         )}
       </div>
@@ -180,7 +181,7 @@ const Bidding = () => {
                 <div className="text-xs text-green-600 mt-1">80%+ compatibility</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{user.cluster}</div>
+                <div className="text-2xl font-bold text-blue-600">{user.profileData?.cluster || 'General'}</div>
                 <div className="text-sm text-gray-600">Your Cluster</div>
                 <div className="text-xs text-blue-600 mt-1">Optimized Selection</div>
               </div>
@@ -215,9 +216,9 @@ const Bidding = () => {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-orange-600">
-              {user ? user.kcseGrade : 'B (65)'}
+              {user ? `Grade ${user.profileData?.grade || 9}` : 'B (65)'}
             </div>
-            <div className="text-sm text-gray-600">Your KCSE Points</div>
+            <div className="text-sm text-gray-600">Your Current Grade</div>
           </CardContent>
         </Card>
         <Card>
@@ -237,7 +238,7 @@ const Bidding = () => {
               <div className="font-medium text-blue-900">KUCCPS Selection Guidelines</div>
               <div className="text-sm text-blue-700">
                 {user 
-                  ? `Based on your ${user.cluster} cluster and ${user.kcseGrade} performance, we've curated the best matching programs. AI has optimized your selection for maximum placement probability.`
+                  ? `Based on your ${user.profileData?.cluster || 'current'} cluster and Grade ${user.profileData?.grade || 'current'} performance, we've curated the best matching programs. AI has optimized your selection for maximum placement probability.`
                   : 'Select up to 6 programs in order of preference. KUCCPS will place you in the highest-preference program where you meet the cut-off points. Consider your KCSE performance, subject cluster, and career goals.'
                 }
               </div>
