@@ -23,6 +23,7 @@ import CBCAssessmentPage from "./pages/CBCAssessmentPage";
 import CBCPathwayPage from "./pages/CBCPathwayPage";
 import NotFound from "./pages/NotFound";
 import ResponsibleAIPage from "./pages/ResponsibleAIPage";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 const queryClient = new QueryClient();
 
@@ -74,11 +75,13 @@ const App = () => (
       <AuthProvider>
         <FeatureFlagsProvider>
           <FeedbackProvider>
-            <CBCProvider>
-              <Toaster />
-              <Sonner />
-              <AppContent />
-            </CBCProvider>
+            <NotificationProvider>
+              <CBCProvider>
+                <Toaster />
+                <Sonner />
+                <AppContent />
+              </CBCProvider>
+            </NotificationProvider>
           </FeedbackProvider>
         </FeatureFlagsProvider>
       </AuthProvider>
