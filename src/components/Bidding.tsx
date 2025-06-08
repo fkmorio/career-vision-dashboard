@@ -41,8 +41,8 @@ const Bidding = () => {
 
   // Transition types
   const transitionTypes = [
-    { value: 'JSS-SSS', label: 'JSS to SSS (Grade 9 → Grade 10)', description: 'Junior Secondary to Senior Secondary School' },
-    { value: 'SSS-Tertiary', label: 'SSS to Tertiary (Grade 12 → University/TVET)', description: 'Senior Secondary to Tertiary Education' }
+    { value: 'JSS-SSS' as const, label: 'JSS to SSS (Grade 9 → Grade 10)', description: 'Junior Secondary to Senior Secondary School' },
+    { value: 'SSS-Tertiary' as const, label: 'SSS to Tertiary (Grade 12 → University/TVET)', description: 'Senior Secondary to Tertiary Education' }
   ];
 
   // Generate dynamic opportunities based on transition type and user profile
@@ -63,7 +63,7 @@ const Bidding = () => {
         competitiveness: 95,
         employability: 98,
         marketDemand: 'Very High',
-        transitionType: 'SSS-Tertiary',
+        transitionType: 'SSS-Tertiary' as const,
         placementStats: {
           applied: 12450,
           placed: 285,
@@ -94,7 +94,7 @@ const Bidding = () => {
         competitiveness: 82,
         employability: 95,
         marketDemand: 'Very High',
-        transitionType: 'SSS-Tertiary',
+        transitionType: 'SSS-Tertiary' as const,
         placementStats: {
           applied: 8920,
           placed: 520,
@@ -126,7 +126,7 @@ const Bidding = () => {
         competitiveness: 88,
         employability: 92,
         marketDemand: 'High',
-        transitionType: 'JSS-SSS',
+        transitionType: 'JSS-SSS' as const,
         placementStats: {
           applied: 3200,
           placed: 180,
@@ -157,7 +157,7 @@ const Bidding = () => {
         competitiveness: 75,
         employability: 85,
         marketDemand: 'Moderate',
-        transitionType: 'JSS-SSS',
+        transitionType: 'JSS-SSS' as const,
         placementStats: {
           applied: 2800,
           placed: 280,
@@ -189,7 +189,7 @@ const Bidding = () => {
         competitiveness: 60,
         employability: 88,
         marketDemand: 'High',
-        transitionType: 'SSS-Tertiary',
+        transitionType: 'SSS-Tertiary' as const,
         placementStats: {
           applied: 2200,
           placed: 450,
