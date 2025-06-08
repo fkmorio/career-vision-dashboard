@@ -5,81 +5,136 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star, Target, Brain } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Clock, GraduationCap, Users, TrendingUp, AlertCircle, MapPin, Star, Target, Brain, DollarSign, Calendar, BookOpen, ArrowRight } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 
 const Bidding = () => {
   const { user } = useAuth();
   const [activeBids, setActiveBids] = useState([]);
   const [selectedPriority, setSelectedPriority] = useState({});
+  const [transitionType, setTransitionType] = useState('jss-to-sss'); // Default transition
 
-  // Generate dynamic opportunities based on user profile
+  // Transition types
+  const transitionTypes = [
+    { value: 'jss-to-sss', label: 'JSS to SSS (Grade 9 → Grade 10)', description: 'Junior Secondary to Senior Secondary School' },
+    { value: 'sss-to-tertiary', label: 'SSS to Tertiary (Grade 12 → University/TVET)', description: 'Senior Secondary to Tertiary Education' }
+  ];
+
+  // Generate dynamic opportunities based on transition type and user profile
   const generateUserOpportunities = () => {
     if (!user) return [];
 
     const userPoints = parseInt(user.profileData?.grade?.toString() || '65') || 65;
     
-    const baseOpportunities = [
-      {
-        id: 1,
-        institution: 'University of Nairobi',
-        program: user.profileData?.cluster === 'STEM' ? 'Bachelor of Medicine and Bachelor of Surgery' : 
-                 user.profileData?.cluster === 'Business' ? 'Bachelor of Commerce' : 'Bachelor of Arts',
-        code: 'J01/01/01',
-        type: 'Degree',
-        location: 'Nairobi',
-        cutoffPoints: { 
-          current: user.profileData?.cluster === 'STEM' ? 75 : user.profileData?.cluster === 'Business' ? 68 : 62, 
-          minimum: user.profileData?.cluster === 'STEM' ? 70 : user.profileData?.cluster === 'Business' ? 62 : 55, 
-          maximum: user.profileData?.cluster === 'STEM' ? 84 : user.profileData?.cluster === 'Business' ? 75 : 68 
+    if (transitionType === 'jss-to-sss') {
+      return [
+        {
+          id: 1,
+          institution: 'Nairobi High School',
+          program: 'STEM Pathway - Senior Secondary',
+          code: 'SSS-STEM-001',
+          type: 'Senior Secondary',
+          location: 'Nairobi',
+          cutoffPoints: { current: 75, minimum: 70, maximum: 85 },
+          deadline: '2024-06-15',
+          timeLeft: '3 days',
+          totalBidders: 840,
+          capacity: 120,
+          clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
+          description: 'Focus on Science, Technology, Engineering, and Mathematics for university preparation.',
+          status: 'active',
+          userBid: null,
+          helbEligible: false,
+          scholarships: ['Academic Excellence', 'STEM Scholarship'],
+          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'SSS'),
+          competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High',
+          fees: { tuition: 45000, boarding: 25000, other: 15000 },
+          duration: '3 years (Grade 10-12)',
+          currentBand: 'A',
+          nextReviewDate: '2024-07-01'
         },
-        deadline: '2024-06-15',
-        timeLeft: '3 days',
-        totalBidders: user.profileData?.cluster === 'STEM' ? 2840 : 1840,
-        capacity: user.profileData?.cluster === 'STEM' ? 150 : 200,
-        clusters: user.profileData?.cluster === 'STEM' ? ['Mathematics', 'Physics', 'Chemistry', 'Biology'] :
-                  user.profileData?.cluster === 'Business' ? ['Mathematics', 'Business Studies', 'Economics'] :
-                  ['English', 'Literature', 'History', 'Geography'],
-        description: `Premier ${user.profileData?.cluster?.toLowerCase() || 'academic'} program with excellent career prospects.`,
-        status: 'active',
-        userBid: null,
-        helbEligible: true,
-        scholarships: ['Merit-based', 'Need-based'],
-        matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'University'),
-        competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High'
-      },
-      {
-        id: 2,
-        institution: user.profileData?.cluster === 'Technical' ? 'Kiambu Institute of Science and Technology' : 'JKUAT',
-        program: user.profileData?.cluster === 'Technical' ? 'Diploma in Information Technology' : 
-                 'Bachelor of Science in Computer Science',
-        code: user.profileData?.cluster === 'Technical' ? 'T07/04/01' : 'J07/04/02',
-        type: user.profileData?.cluster === 'Technical' ? 'Diploma' : 'Degree',
-        location: 'Kiambu',
-        cutoffPoints: { 
-          current: user.profileData?.cluster === 'Technical' ? 45 : 65, 
-          minimum: user.profileData?.cluster === 'Technical' ? 40 : 58, 
-          maximum: user.profileData?.cluster === 'Technical' ? 55 : 72 
+        {
+          id: 2,
+          institution: 'Kiambu Technical High School',
+          program: 'TVET Pathway - Technical Track',
+          code: 'SSS-TVET-002',
+          type: 'Senior Secondary',
+          location: 'Kiambu',
+          cutoffPoints: { current: 55, minimum: 50, maximum: 65 },
+          deadline: '2024-06-12',
+          timeLeft: '8 hours',
+          totalBidders: 560,
+          capacity: 80,
+          clusters: ['Mathematics', 'Physics', 'Technical Studies'],
+          description: 'Technical and Vocational pathway leading to practical skills and TVET colleges.',
+          status: 'urgent',
+          userBid: null,
+          helbEligible: false,
+          scholarships: ['Technical Skills Fund'],
+          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'SSS'),
+          competitiveness: userPoints >= 60 ? 'Low' : 'Medium',
+          fees: { tuition: 35000, boarding: 20000, other: 10000 },
+          duration: '3 years (Grade 10-12)',
+          currentBand: 'B',
+          nextReviewDate: '2024-07-15'
+        }
+      ];
+    } else {
+      return [
+        {
+          id: 3,
+          institution: 'University of Nairobi',
+          program: 'Bachelor of Medicine and Bachelor of Surgery',
+          code: 'J01/01/01',
+          type: 'Degree',
+          location: 'Nairobi',
+          cutoffPoints: { current: 75, minimum: 70, maximum: 84 },
+          deadline: '2024-06-15',
+          timeLeft: '3 days',
+          totalBidders: 2840,
+          capacity: 150,
+          clusters: ['Mathematics', 'Physics', 'Chemistry', 'Biology'],
+          description: 'Premier medical program with excellent career prospects.',
+          status: 'active',
+          userBid: null,
+          helbEligible: true,
+          scholarships: ['Merit-based', 'Need-based'],
+          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'University'),
+          competitiveness: userPoints >= 75 ? 'Low' : userPoints >= 65 ? 'Medium' : 'High',
+          fees: { tuition: 120000, boarding: 45000, other: 25000 },
+          duration: '6 years',
+          currentBand: 'A+',
+          nextReviewDate: '2024-08-01'
         },
-        deadline: '2024-06-12',
-        timeLeft: '8 hours',
-        totalBidders: 1560,
-        capacity: 120,
-        clusters: user.profileData?.cluster === 'Technical' ? ['Mathematics', 'Physics', 'Computer Studies'] :
-                  ['Mathematics', 'Physics', 'Computer Studies'],
-        description: 'Technology-focused program with industry partnerships and internships.',
-        status: 'urgent',
-        userBid: null,
-        helbEligible: true,
-        scholarships: ['Tech Innovation Fund'],
-        matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', user.profileData?.cluster === 'Technical' ? 'TVET' : 'University'),
-        competitiveness: userPoints >= (user.profileData?.cluster === 'Technical' ? 50 : 70) ? 'Low' : 'Medium'
-      }
-    ];
-
-    return baseOpportunities.filter(opp => 
-      userPoints >= opp.cutoffPoints.minimum - 10 // Show opportunities within reach
-    );
+        {
+          id: 4,
+          institution: 'Kiambu Institute of Science and Technology',
+          program: 'Diploma in Information Technology',
+          code: 'T07/04/01',
+          type: 'Diploma',
+          location: 'Kiambu',
+          cutoffPoints: { current: 45, minimum: 40, maximum: 55 },
+          deadline: '2024-06-12',
+          timeLeft: '8 hours',
+          totalBidders: 1560,
+          capacity: 120,
+          clusters: ['Mathematics', 'Physics', 'Computer Studies'],
+          description: 'Technology-focused program with industry partnerships and internships.',
+          status: 'urgent',
+          userBid: null,
+          helbEligible: true,
+          scholarships: ['Tech Innovation Fund'],
+          matchScore: calculateMatchScore(userPoints, user.profileData?.cluster || 'General', 'TVET'),
+          competitiveness: userPoints >= 50 ? 'Low' : 'Medium',
+          fees: { tuition: 85000, boarding: 35000, other: 15000 },
+          duration: '3 years',
+          currentBand: 'B+',
+          nextReviewDate: '2024-07-20'
+        }
+      ];
+    }
   };
 
   const calculateMatchScore = (userPoints, cluster, institutionType) => {
@@ -127,23 +182,41 @@ const Bidding = () => {
     }
   };
 
+  const getBandColor = (band) => {
+    switch(band) {
+      case 'A+': return 'bg-green-600 text-white';
+      case 'A': return 'bg-green-500 text-white';
+      case 'B+': return 'bg-blue-500 text-white';
+      case 'B': return 'bg-blue-400 text-white';
+      case 'C': return 'bg-yellow-500 text-white';
+      default: return 'bg-gray-500 text-white';
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-KE', {
+      style: 'currency',
+      currency: 'KES',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
   const userPoints = user ? parseInt(user.profileData?.grade?.toString() || '65') || 65 : 65;
   const matchProbability = kuccpsOpportunities.length > 0 
     ? Math.round(kuccpsOpportunities.reduce((acc, opp) => acc + opp.matchScore, 0) / kuccpsOpportunities.length)
     : 78;
+
+  const currentTransition = transitionTypes.find(t => t.value === transitionType);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {user ? `KUCCPS Selection for ${user.name}` : 'KUCCPS Program Selection'}
+            {user ? `Enhanced KUCCPS Selection for ${user.name}` : 'Enhanced KUCCPS Program Selection'}
           </h1>
           <p className="text-gray-600 mt-1">
-            {user 
-              ? `AI-curated programs for your ${user.profileData?.cluster || 'current'} cluster and Grade ${user.profileData?.grade || 'current'} performance`
-              : 'Select and prioritize your preferred university programs through KUCCPS'
-            }
+            Choose your transition pathway and explore programs with detailed costs, duration, and current performance bands
           </p>
         </div>
         {user && (
@@ -156,6 +229,40 @@ const Bidding = () => {
           </div>
         )}
       </div>
+
+      {/* Transition Type Selection */}
+      <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+        <CardHeader>
+          <CardTitle className="flex items-center text-green-900">
+            <ArrowRight className="w-5 h-5 mr-2" />
+            Select Your Transition Pathway
+          </CardTitle>
+          <CardDescription>Choose the educational transition that applies to your current situation</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Select value={transitionType} onValueChange={setTransitionType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select transition type" />
+            </SelectTrigger>
+            <SelectContent>
+              {transitionTypes.map((transition) => (
+                <SelectItem key={transition.value} value={transition.value}>
+                  <div>
+                    <div className="font-medium">{transition.label}</div>
+                    <div className="text-sm text-gray-600">{transition.description}</div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {currentTransition && (
+            <div className="mt-3 p-3 bg-white rounded-lg border">
+              <div className="font-medium text-blue-900">{currentTransition.label}</div>
+              <div className="text-sm text-gray-600">{currentTransition.description}</div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* AI Recommendations Panel */}
       {user && (
@@ -229,17 +336,17 @@ const Bidding = () => {
         </Card>
       </div>
 
-      {/* KUCCPS Instructions */}
+      {/* Enhanced Instructions */}
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
             <div className="space-y-1">
-              <div className="font-medium text-blue-900">KUCCPS Selection Guidelines</div>
+              <div className="font-medium text-blue-900">Enhanced KUCCPS Selection Guidelines</div>
               <div className="text-sm text-blue-700">
                 {user 
-                  ? `Based on your ${user.profileData?.cluster || 'current'} cluster and Grade ${user.profileData?.grade || 'current'} performance, we've curated the best matching programs. AI has optimized your selection for maximum placement probability.`
-                  : 'Select up to 6 programs in order of preference. KUCCPS will place you in the highest-preference program where you meet the cut-off points. Consider your KCSE performance, subject cluster, and career goals.'
+                  ? `For your ${currentTransition?.label} transition, we've curated programs with detailed cost breakdowns, course duration, and current performance bands. Consider your academic performance, financial capacity, and career goals.`
+                  : `Select programs based on your transition type. Review program costs, duration, and current performance bands to make informed decisions.`
                 }
               </div>
             </div>
@@ -254,8 +361,8 @@ const Bidding = () => {
             {user ? 'AI-Recommended Programs' : 'Available Programs'}
           </h2>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">AI Match Score:</span>
-            <Badge className="bg-green-100 text-green-800">{matchProbability}% Compatible</Badge>
+            <span className="text-sm text-gray-600">Current Transition:</span>
+            <Badge className="bg-green-100 text-green-800">{currentTransition?.label}</Badge>
           </div>
         </div>
         
@@ -284,8 +391,8 @@ const Bidding = () => {
                         HELB Eligible
                       </Badge>
                     )}
-                    <Badge className={`bg-gray-100 ${getCompetitivenessColor(program.competitiveness)}`}>
-                      {program.competitiveness} Competition
+                    <Badge className={`${getBandColor(program.currentBand)}`}>
+                      Band {program.currentBand}
                     </Badge>
                   </div>
                   <CardDescription className="mt-1">
@@ -306,32 +413,117 @@ const Bidding = () => {
             <CardContent className="space-y-4">
               <p className="text-gray-600 text-sm">{program.description}</p>
               
-              {/* Subject Clusters */}
-              <div>
-                <div className="text-sm font-medium mb-2">Required Subject Clusters:</div>
-                <div className="flex flex-wrap gap-1">
-                  {program.clusters.map((cluster, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {cluster}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Scholarships */}
-              {program.scholarships.length > 0 && (
-                <div>
-                  <div className="text-sm font-medium mb-2">Available Scholarships:</div>
-                  <div className="flex flex-wrap gap-1">
-                    {program.scholarships.map((scholarship, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        <Star className="w-3 h-3 mr-1" />
-                        {scholarship}
-                      </Badge>
-                    ))}
+              {/* Enhanced Program Details with Tabs */}
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="costs">Costs</TabsTrigger>
+                  <TabsTrigger value="duration">Duration</TabsTrigger>
+                  <TabsTrigger value="performance">Performance</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview" className="space-y-3">
+                  <div>
+                    <div className="text-sm font-medium mb-2">Required Subject Clusters:</div>
+                    <div className="flex flex-wrap gap-1">
+                      {program.clusters.map((cluster, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {cluster}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+
+                  {program.scholarships.length > 0 && (
+                    <div>
+                      <div className="text-sm font-medium mb-2">Available Scholarships:</div>
+                      <div className="flex flex-wrap gap-1">
+                        {program.scholarships.map((scholarship, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            <Star className="w-3 h-3 mr-1" />
+                            {scholarship}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="costs" className="space-y-3">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-3 bg-white rounded">
+                        <DollarSign className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                        <div className="font-bold text-blue-600">{formatCurrency(program.fees.tuition)}</div>
+                        <div className="text-xs text-gray-600">Annual Tuition</div>
+                      </div>
+                      <div className="text-center p-3 bg-white rounded">
+                        <DollarSign className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                        <div className="font-bold text-green-600">{formatCurrency(program.fees.boarding)}</div>
+                        <div className="text-xs text-gray-600">Boarding (Annual)</div>
+                      </div>
+                      <div className="text-center p-3 bg-white rounded">
+                        <DollarSign className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                        <div className="font-bold text-orange-600">{formatCurrency(program.fees.other)}</div>
+                        <div className="text-xs text-gray-600">Other Fees</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-3 bg-blue-50 rounded text-center">
+                      <div className="font-bold text-lg text-blue-800">
+                        {formatCurrency(program.fees.tuition + program.fees.boarding + program.fees.other)}
+                      </div>
+                      <div className="text-sm text-blue-600">Total Annual Cost</div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="duration" className="space-y-3">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center justify-center mb-3">
+                      <Calendar className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-xl text-purple-600">{program.duration}</div>
+                      <div className="text-sm text-gray-600 mt-1">Program Duration</div>
+                    </div>
+                    <div className="mt-4 text-sm text-gray-600">
+                      <div className="font-medium mb-2">What to expect:</div>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Structured academic progression</li>
+                        <li>Competency-based assessments</li>
+                        <li>Career guidance and counseling</li>
+                        <li>Industry exposure and internships</li>
+                      </ul>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="performance" className="space-y-3">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center p-3 bg-white rounded">
+                        <Badge className={`${getBandColor(program.currentBand)} mb-2`}>
+                          Band {program.currentBand}
+                        </Badge>
+                        <div className="text-xs text-gray-600">Current Performance Band</div>
+                      </div>
+                      <div className="text-center p-3 bg-white rounded">
+                        <div className="font-bold text-gray-800">{program.nextReviewDate}</div>
+                        <div className="text-xs text-gray-600">Next Review Date</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <div className="font-medium mb-2">Performance Indicators:</div>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Graduate employment rate: 92%</li>
+                        <li>Industry satisfaction: High</li>
+                        <li>Student satisfaction: 4.2/5</li>
+                        <li>Research output: Above average</li>
+                      </ul>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
 
               {/* Cut-off Information */}
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
@@ -388,10 +580,14 @@ const Bidding = () => {
               {/* Selection Actions */}
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="text-sm text-gray-600">
-                  Capacity: {program.capacity} students • Competition: {program.competitiveness}
+                  <Badge className={`${getCompetitivenessColor(program.competitiveness)} mr-2`}>
+                    {program.competitiveness} Competition
+                  </Badge>
+                  <span>Capacity: {program.capacity} students</span>
                 </div>
                 <div className="space-x-2">
                   <Button variant="outline" size="sm">
+                    <BookOpen className="w-4 h-4 mr-1" />
                     View Details
                   </Button>
                   <select 

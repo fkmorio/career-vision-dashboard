@@ -1,24 +1,59 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake, GraduationCap, BookCheck } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake, GraduationCap, BookCheck, Heart, Target, Clock, Plus } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import FeatureFlag from './FeatureFlag';
 import { useFeatureFlag } from '../hooks/useFeatureFlag';
+import { toast } from '@/hooks/use-toast';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { isEnabled: gamificationEnabled } = useFeatureFlag('gamification-system');
   const { isEnabled: enhancedAIEnabled, variant: aiVariant } = useFeatureFlag('enhanced-ai-recommendations');
+  
+  // State for interactive features
+  const [interests, setInterests] = useState<string[]>([]);
+  const [newInterest, setNewInterest] = useState('');
+  const [progressTarget, setProgressTarget] = useState(90);
+  const [selectedSkillBadge, setSelectedSkillBadge] = useState<any>(null);
 
   if (!user) {
     return null; // This will be handled by the main App component
   }
+
+  const handleExpressInterest = (interest: string) => {
+    if (interest && !interests.includes(interest)) {
+      setInterests(prev => [...prev, interest]);
+      toast({
+        title: "Interest Added",
+        description: `You've expressed interest in ${interest}`,
+      });
+    }
+    setNewInterest('');
+  };
+
+  const handleRemoveInterest = (interest: string) => {
+    setInterests(prev => prev.filter(i => i !== interest));
+    toast({
+      title: "Interest Removed",
+      description: `Removed ${interest} from your interests`,
+    });
+  };
+
+  const handleProgressUpdate = () => {
+    toast({
+      title: "Progress Target Updated",
+      description: `Your new target is ${progressTarget}%`,
+    });
+  };
 
   const quickActions = [
     { 
@@ -75,10 +110,10 @@ const StudentDashboard = () => {
   ];
 
   const skillBadges = [
-    { name: "STEM Pathway", level: "Advanced", color: "bg-blue-100 text-blue-800" },
-    { name: "Research Skills", level: "Intermediate", color: "bg-green-100 text-green-800" },
-    { name: "Critical Thinking", level: "Advanced", color: "bg-purple-100 text-purple-800" },
-    { name: "Digital Literacy", level: "Expert", color: "bg-orange-100 text-orange-800" }
+    { name: "STEM Pathway", level: "Advanced", color: "bg-blue-100 text-blue-800", progress: 85, description: "Strong foundation in Science, Technology, Engineering, and Mathematics" },
+    { name: "Research Skills", level: "Intermediate", color: "bg-green-100 text-green-800", progress: 70, description: "Ability to conduct systematic investigation and analysis" },
+    { name: "Critical Thinking", level: "Advanced", color: "bg-purple-100 text-purple-800", progress: 90, description: "Analytical problem-solving and logical reasoning" },
+    { name: "Digital Literacy", level: "Expert", color: "bg-orange-100 text-orange-800", progress: 95, description: "Proficiency in digital tools and technologies" }
   ];
 
   const getGreeting = () => {
@@ -241,15 +276,47 @@ const StudentDashboard = () => {
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
-              <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-              Academic Progress
+            <CardTitle className="text-lg flex items-center justify-between">
+              <div className="flex items-center">
+                <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                Academic Progress
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Target className="w-4 h-4 mr-1" />
+                    Set Target
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Update Progress Target</DialogTitle>
+                    <DialogDescription>Set your academic progress goal</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">Target Progress (%)</label>
+                      <Input
+                        type="number"
+                        value={progressTarget}
+                        onChange={(e) => setProgressTarget(Number(e.target.value))}
+                        min="0"
+                        max="100"
+                      />
+                    </div>
+                    <Button onClick={handleProgressUpdate} className="w-full">
+                      Update Target
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">85%</div>
-              <div className="text-sm text-gray-600">Overall Progress</div>
+              <div className="text-sm text-gray-600">Current Progress</div>
+              <div className="text-xs text-purple-600">Target: {progressTarget}%</div>
             </div>
             <Progress value={85} className="h-2" />
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -267,7 +334,53 @@ const StudentDashboard = () => {
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
-            <CardTitle className="text-lg">Next Steps</CardTitle>
+            <CardTitle className="text-lg flex items-center justify-between">
+              Next Steps
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Heart className="w-4 h-4 mr-1" />
+                    Express Interest
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Express Your Interests</DialogTitle>
+                    <DialogDescription>Add areas you're interested in exploring</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium">Add Interest</label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newInterest}
+                          onChange={(e) => setNewInterest(e.target.value)}
+                          placeholder="e.g., Computer Science, Medicine..."
+                        />
+                        <Button onClick={() => handleExpressInterest(newInterest)}>
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Your Interests</label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {interests.map((interest, index) => (
+                          <Badge 
+                            key={index} 
+                            variant="secondary" 
+                            className="cursor-pointer hover:bg-red-100"
+                            onClick={() => handleRemoveInterest(interest)}
+                          >
+                            {interest} ×
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -288,22 +401,53 @@ const StudentDashboard = () => {
         </Card>
       </div>
 
-      {/* Skill Badges */}
+      {/* Interactive Skill Badges */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Brain className="w-5 h-5 mr-2 text-purple-600" />
-            Competency Badges
+            Interactive Competency Badges
           </CardTitle>
-          <CardDescription>Your skills and competencies based on AI assessment</CardDescription>
+          <CardDescription>Click on badges to view detailed progress and recommendations</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {skillBadges.map((badge, index) => (
-              <div key={index} className={`p-3 rounded-lg ${badge.color} text-center`}>
-                <div className="font-medium text-sm">{badge.name}</div>
-                <div className="text-xs mt-1">{badge.level}</div>
-              </div>
+              <Dialog key={index}>
+                <DialogTrigger asChild>
+                  <div className={`p-3 rounded-lg ${badge.color} text-center cursor-pointer hover:shadow-md transition-shadow`}>
+                    <div className="font-medium text-sm">{badge.name}</div>
+                    <div className="text-xs mt-1">{badge.level}</div>
+                    <div className="text-xs mt-1 opacity-75">{badge.progress}%</div>
+                  </div>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{badge.name}</DialogTitle>
+                    <DialogDescription>{badge.description}</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Progress</span>
+                        <span>{badge.progress}%</span>
+                      </div>
+                      <Progress value={badge.progress} className="h-3" />
+                    </div>
+                    <div className="text-sm">
+                      <div className="font-medium mb-2">Next Steps:</div>
+                      <ul className="list-disc list-inside space-y-1 text-gray-600">
+                        <li>Complete additional practice exercises</li>
+                        <li>Participate in relevant CBC assessments</li>
+                        <li>Apply skills in project-based learning</li>
+                      </ul>
+                    </div>
+                    <Button className="w-full">
+                      View Detailed Roadmap
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             ))}
           </div>
         </CardContent>
