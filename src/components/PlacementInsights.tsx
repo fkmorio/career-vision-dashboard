@@ -2,11 +2,11 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Badge } from "@/components/ui/badge";
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import { TrendingUp, Target, Brain, CheckCircle } from 'lucide-react';
 
 const PlacementInsights = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   // Dynamic data based on user profile
   const getUserSpecificData = () => {
@@ -20,7 +20,7 @@ const PlacementInsights = () => {
       'Technical': { accuracy: 95, matchRate: 91, trend: '+15%' }
     };
     
-    return clusterMap[user.cluster] || { accuracy: 85, matchRate: 80, trend: '+7%' };
+    return clusterMap[user.profileData?.cluster as keyof typeof clusterMap] || { accuracy: 85, matchRate: 80, trend: '+7%' };
   };
 
   const userMetrics = getUserSpecificData();
@@ -63,12 +63,12 @@ const PlacementInsights = () => {
             {user ? `Placement Insights for ${user.name}` : 'Kenya Placement Insights'}
           </h1>
           <p className="text-gray-600 mt-1">
-            {user ? `Personalized analytics for ${user.cluster} cluster` : 'Real-time analytics on tertiary education placement through KUCCPS'}
+            {user ? `Personalized analytics for ${user.profileData?.cluster || 'your'} cluster` : 'Real-time analytics on tertiary education placement through KUCCPS'}
           </p>
         </div>
         {user && (
           <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-            {user.cluster} Cluster
+            {user.profileData?.cluster || 'General'} Cluster
           </Badge>
         )}
       </div>
@@ -98,8 +98,8 @@ const PlacementInsights = () => {
                 <div className="text-xs text-blue-600 mt-1">Your Cluster Average</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">{user.competencyScore}</div>
-                <div className="text-sm text-gray-600">Competency Score</div>
+                <div className="text-2xl font-bold text-purple-600">{user.role}</div>
+                <div className="text-sm text-gray-600">User Role</div>
                 <div className="text-xs text-purple-600 mt-1">CBC Aligned</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
@@ -159,7 +159,7 @@ const PlacementInsights = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Placement Trends {user && `- ${user.cluster} Focus`}</CardTitle>
+            <CardTitle>Placement Trends {user && `- ${user.profileData?.cluster || 'Your'} Focus`}</CardTitle>
             <CardDescription>
               {user ? `Your cluster performance vs general trends` : 'KUCCPS, TVET, and University placement rates over time'}
             </CardDescription>
@@ -175,7 +175,7 @@ const PlacementInsights = () => {
                 <Line type="monotone" dataKey="tvetEnrolled" stroke="#10b981" strokeWidth={2} name="TVET %" />
                 <Line type="monotone" dataKey="universityPlaced" stroke="#f59e0b" strokeWidth={2} name="University %" />
                 {user && (
-                  <Line type="monotone" dataKey="userCluster" stroke="#8b5cf6" strokeWidth={3} name={`${user.cluster} %`} strokeDasharray="5 5" />
+                  <Line type="monotone" dataKey="userCluster" stroke="#8b5cf6" strokeWidth={3} name={`${user.profileData?.cluster || 'Your'} %`} strokeDasharray="5 5" />
                 )}
               </LineChart>
             </ResponsiveContainer>

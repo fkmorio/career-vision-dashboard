@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,13 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Users, Book, LayoutDashboard, Brain, Award, TrendingUp, MapPin, MessageSquare, LogOut, Flag, Settings, HeartHandshake, GraduationCap, BookCheck } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import FeatureFlag from './FeatureFlag';
 import { useFeatureFlag } from '../hooks/useFeatureFlag';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = useUser();
+  const { user, logout } = useAuth();
   const { isEnabled: gamificationEnabled } = useFeatureFlag('gamification-system');
   const { isEnabled: enhancedAIEnabled, variant: aiVariant } = useFeatureFlag('enhanced-ai-recommendations');
 
@@ -62,7 +63,7 @@ const StudentDashboard = () => {
       description: "Track your placement choices", 
       icon: TrendingUp, 
       action: () => navigate('/bidding'),
-      badge: `${user.bids} Active`
+      badge: "Active Bids"
     },
     { 
       title: "Share Feedback", 
@@ -98,10 +99,10 @@ const StudentDashboard = () => {
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-            {user.kuccpsStatus}
+            {user.role === 'student' ? 'Active Learner' : user.role}
           </Badge>
           <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
-            CBC Grade 9
+            CBC Grade {user.profileData?.grade || 9}
           </Badge>
           <Button variant="outline" size="sm" onClick={() => navigate('/feature-flags')} className="text-blue-600 hover:text-blue-700">
             <Flag className="w-4 h-4 mr-2" />
@@ -194,7 +195,7 @@ const StudentDashboard = () => {
             <div className="space-y-3">
               <div className="p-3 bg-white rounded border-l-4 border-blue-500">
                 <div className="font-medium">Smart Career Match</div>
-                <div className="text-sm text-gray-600">Based on your STEM cluster and 92% competency score, consider Computer Science programs at top universities.</div>
+                <div className="text-sm text-gray-600">Based on your {user.profileData?.cluster || 'current'} cluster profile, consider Computer Science programs at top universities.</div>
               </div>
               <div className="p-3 bg-white rounded border-l-4 border-green-500">
                 <div className="font-medium">Scholarship Opportunity</div>
@@ -217,23 +218,23 @@ const StudentDashboard = () => {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Current Grade:</span>
-              <span className="font-medium text-purple-600">Grade 9 (JSS)</span>
+              <span className="font-medium text-purple-600">Grade {user.profileData?.grade || 9} (JSS)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">KCSE Projection:</span>
-              <span className="font-medium text-green-600">Grade {user.kcseGrade}</span>
+              <span className="text-sm text-gray-600">Role:</span>
+              <span className="font-medium text-green-600">{user.role}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">School:</span>
-              <span className="font-medium text-sm">{user.school}</span>
+              <span className="font-medium text-sm">{user.profileData?.school || 'Demo School'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Current Cluster:</span>
-              <span className="font-medium text-sm">{user.cluster}</span>
+              <span className="font-medium text-sm">{user.profileData?.cluster || 'General'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">CBC Competency:</span>
-              <span className="font-medium text-blue-600">{user.competencyScore}/100</span>
+              <span className="text-sm text-gray-600">Language:</span>
+              <span className="font-medium text-blue-600">{user.preferences.language === 'en' ? 'English' : 'Kiswahili'}</span>
             </div>
           </CardContent>
         </Card>
@@ -242,23 +243,23 @@ const StudentDashboard = () => {
           <CardHeader>
             <CardTitle className="text-lg flex items-center">
               <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-              Placement Status
+              Academic Progress
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{user.applications}</div>
-              <div className="text-sm text-gray-600">KUCCPS Applications</div>
+              <div className="text-2xl font-bold text-blue-600">85%</div>
+              <div className="text-sm text-gray-600">Overall Progress</div>
             </div>
-            <Progress value={75} className="h-2" />
+            <Progress value={85} className="h-2" />
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="text-center">
-                <div className="font-semibold text-orange-600">{user.bids}</div>
-                <div className="text-gray-600">Active Bids</div>
+                <div className="font-semibold text-orange-600">12</div>
+                <div className="text-gray-600">Subjects</div>
               </div>
               <div className="text-center">
-                <div className="font-semibold text-green-600">{user.interviews}</div>
-                <div className="text-gray-600">Interviews</div>
+                <div className="font-semibold text-green-600">Level 4</div>
+                <div className="text-gray-600">Avg Level</div>
               </div>
             </div>
           </CardContent>
@@ -271,12 +272,12 @@ const StudentDashboard = () => {
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
-                <span className="text-sm">KUCCPS Revision</span>
-                <span className="text-xs text-blue-600">June 15</span>
+                <span className="text-sm">Pathway Selection</span>
+                <span className="text-xs text-blue-600">Due Soon</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                <span className="text-sm">HELB Decision</span>
-                <span className="text-xs text-green-600">{user.helbStatus}</span>
+                <span className="text-sm">Portfolio Update</span>
+                <span className="text-xs text-green-600">In Progress</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
                 <span className="text-sm">AI Assessment</span>

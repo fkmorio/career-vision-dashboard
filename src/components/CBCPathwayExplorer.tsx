@@ -17,11 +17,11 @@ import {
   CheckCircle
 } from "lucide-react";
 import { useCBC } from '../contexts/CBCContext';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const CBCPathwayExplorer = () => {
   const { pathways, getPathwayRecommendations, setCurrentPathway } = useCBC();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [selectedPathway, setSelectedPathway] = useState<string>('');
 
   const recommendedPathways = user ? getPathwayRecommendations(user) : pathways;
@@ -53,7 +53,7 @@ const CBCPathwayExplorer = () => {
           <h1 className="text-3xl font-bold text-gray-900">CBC Pathway Explorer</h1>
           <p className="text-gray-600 mt-1">
             {user 
-              ? `AI-powered pathway recommendations for ${user.name} (${user.cluster} cluster)`
+              ? `AI-powered pathway recommendations for ${user.name} (${user.profileData?.cluster || 'General'} cluster)`
               : 'Discover your ideal Senior Secondary School pathway'
             }
           </p>
@@ -73,8 +73,8 @@ const CBCPathwayExplorer = () => {
               Your Personalized Recommendations
             </CardTitle>
             <CardDescription>
-              Based on your competency score ({user.competencyScore}), cluster ({user.cluster}), 
-              and academic performance ({user.kcseGrade})
+              Based on your role ({user.role}), school ({user.profileData?.school || 'Not specified'}), 
+              and current cluster ({user.profileData?.cluster || 'General'})
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -93,11 +93,11 @@ const CBCPathwayExplorer = () => {
                 <div className="text-sm text-gray-600">Average Match Rate</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">{user.cluster}</div>
+                <div className="text-2xl font-bold text-purple-600">{user.profileData?.cluster || 'General'}</div>
                 <div className="text-sm text-gray-600">Current Cluster</div>
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-orange-600">Grade 9</div>
+                <div className="text-2xl font-bold text-orange-600">Grade {user.profileData?.grade || 9}</div>
                 <div className="text-sm text-gray-600">Selection Phase</div>
               </div>
             </div>
@@ -239,9 +239,9 @@ const CBCPathwayExplorer = () => {
                       Why this pathway is recommended:
                     </div>
                     <div className="text-xs text-blue-800">
-                      {user.cluster === pathway.name && '✓ Matches your current cluster focus'}
-                      {user.competencyScore >= 85 && ' ✓ Aligns with your high competency score'}
-                      {pathway.name === 'STEM' && user.competencyScore >= 90 && ' ✓ Excellent for high achievers in your profile'}
+                      {user.profileData?.cluster === pathway.name && '✓ Matches your current cluster focus'}
+                      {user.role === 'student' && ' ✓ Aligns with your student profile'}
+                      {pathway.name === 'STEM' && user.role === 'student' && ' ✓ Excellent for your academic profile'}
                     </div>
                   </div>
                 )}
