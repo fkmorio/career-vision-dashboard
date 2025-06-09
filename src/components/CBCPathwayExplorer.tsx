@@ -37,8 +37,8 @@ const CBCPathwayExplorer = () => {
   };
 
   const getMatchPercentage = (pathway: any) => {
-    if (!user) return 75;
-    return pathway.recommendationScore || 75;
+    if (!user) return 75.00;
+    return Math.round((pathway.recommendationScore || 75) * 100) / 100;
   };
 
   const handleSelectPathway = (pathway: any) => {
@@ -87,8 +87,8 @@ const CBCPathwayExplorer = () => {
               </div>
               <div className="text-center p-4 bg-white rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {Math.round(recommendedPathways.reduce((acc: number, p: any) => 
-                    acc + getMatchPercentage(p), 0) / recommendedPathways.length)}%
+                  {(Math.round(recommendedPathways.reduce((acc: number, p: any) => 
+                    acc + getMatchPercentage(p), 0) / recommendedPathways.length * 100) / 100).toFixed(2)}%
                 </div>
                 <div className="text-sm text-gray-600">Average Match Rate</div>
               </div>
@@ -138,7 +138,7 @@ const CBCPathwayExplorer = () => {
                     matchPercentage >= 70 ? 'bg-yellow-600' :
                     'bg-gray-600'
                   } text-white`}>
-                    {matchPercentage}% Match
+                    {matchPercentage.toFixed(2)}% Match
                   </Badge>
                 </div>
               )}
@@ -161,7 +161,7 @@ const CBCPathwayExplorer = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Compatibility Score</span>
-                      <span className="font-medium">{matchPercentage}%</span>
+                      <span className="font-medium">{matchPercentage.toFixed(2)}%</span>
                     </div>
                     <Progress value={matchPercentage} className="h-2" />
                   </div>
