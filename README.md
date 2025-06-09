@@ -257,8 +257,6 @@ The platform can be deployed on various hosting platforms:
 ## 📞 Contact
 
 - Project Maintainer: Career Vision Team
-- Email: support@careervision.ke
-- Website: https://careervision.ke
 
 ---
 
