@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AppSidebar from './AppSidebar';
+import { AppSidebar } from './AppSidebar';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationBell from './NotificationBell';
 
